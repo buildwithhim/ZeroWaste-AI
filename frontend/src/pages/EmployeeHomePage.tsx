@@ -1,0 +1,8 @@
+import { ArrowRight, CalendarDays, Leaf, ShoppingBag, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useBookings } from "../context/BookingContext";
+
+export default function EmployeeHomePage() {
+  const { bookings } = useBookings();
+  return <div className="page-frame employee-page"><section className="page-intro"><div><span className="eyebrow">EMPLOYEE HOME</span><h1>Good morning, Jordan.</h1><p>Plan your Indian cafeteria meals for every workday.</p></div><div className="date-card"><CalendarDays size={17} /> Weekly planning · Mon–Fri</div></section><section className="employee-welcome"><div><span className="eyebrow light">YOUR SMARTQ CAFETERIA</span><h2>Plan a better workweek.</h2><p>Choose breakfast, lunch and snacks ahead of time so the cafeteria can prepare just enough.</p><Link className="primary-button" to="menu">Build your weekly plan <ArrowRight size={17} /></Link></div><div className="welcome-stat"><Sparkles size={21} /><strong>{bookings.length}</strong><span>meals planned</span></div></section><section className="section-heading"><div><span className="eyebrow">AT A GLANCE</span><h2>Your cafeteria rhythm</h2></div></section><section className="home-stats"><article><span className="home-stat-icon blue"><ShoppingBag size={19} /></span><strong>{bookings.length}</strong><small>meals selected</small></article><article><span className="home-stat-icon green"><Leaf size={19} /></span><strong>{new Set(bookings.map((booking) => booking.day)).size}</strong><small>workdays planned</small></article><article><span className="home-stat-icon orange"><CalendarDays size={19} /></span><strong>3</strong><small>choices per day</small></article></section></div>;
+}
