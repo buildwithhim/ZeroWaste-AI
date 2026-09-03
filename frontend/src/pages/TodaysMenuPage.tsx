@@ -1,37 +1,334 @@
-import { Check, ChevronRight, LockKeyhole, Save, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useBookings, type Appetite, type MealCategory, type Weekday } from "../context/BookingContext";
-import WeeklyMealCard from "../components/WeeklyMealCard";
-import type { MenuItem } from "../components/MenuCard";
-import SmartPlate from "../components/SmartPlate";
+/**
+ * Booking a week of meals.
+ *
+ * DESIGN CONSTRAINT: booking a meal must take at most two or three
+ * interactions. The previous flow took six -- pick a day, open a dish, open the
+ * Smart Plate modal, choose a size, confirm the plate, then find and press a
+ * separate "Save weekly plan" button somewhere else on the page. Every one of
+ * those steps was a place to give up, and the last one was a place to *think*
+ * you had booked when you had not.
+ *
+ * The flow here is:
+ *   1. the day is already today,
+ *   2. tap a dish -- it is booked, with the recommended plate, and saved.
+ *
+ * Adjusting the plate is an optional third tap on the booked card rather than a
+ * gate in front of the booking. Removing a meal is confirmed, because it is the
+ * one action here that cannot be undone.
+ */
 
-const image = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=85`;
-const weekdays: Weekday[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+import { AlertCircle, Check, ChevronLeft, ChevronRight, Sparkles, Trash2, UtensilsCrossed } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+
+import ConfirmDialog from "../components/ConfirmDialog";
+import DishImage from "../components/DishImage";
+import LoadingSkeleton from "../components/LoadingSkeleton";
+import PlanSyncStatus from "../components/PlanSyncStatus";
+import { EmptyState, ErrorState } from "../components/UxStates";
+import { useBookings, plannedWeekdays, todayKey, type Appetite, type MealCategory, type Weekday } from "../context/BookingContext";
+import { useMenu } from "../hooks/useMenu";
+import type { MenuItem } from "../types/menu";
+
 const categories: MealCategory[] = ["Breakfast", "Lunch", "Snacks"];
-const menuItems: MenuItem[] = [
-  { id: 1, name: "Idli Sambar", category: "Breakfast", description: "Steamed rice cakes with lentil sambar and coconut chutney.", calories: 290, protein: 9, price: 55, isVeg: true, image: image("photo-1630383249896-424e482df921") },
-  { id: 2, name: "Masala Dosa", category: "Breakfast", description: "Crisp dosa with spiced potato, sambar and chutney.", calories: 410, protein: 10, price: 75, isVeg: true, image: image("photo-1668236543090-82eba5ee5976") },
-  { id: 3, name: "Poha", category: "Breakfast", description: "Yellow poha with peanuts, curry leaves and lemon.", calories: 270, protein: 7, price: 45, isVeg: true, image: image("photo-1601050690117-94f5f6fa8bd7") },
-  { id: 4, name: "Upma", category: "Breakfast", description: "Vegetable upma with tempered spices and coriander.", calories: 260, protein: 6, price: 45, isVeg: true, image: image("photo-1547592180-85f173990554") },
-  { id: 5, name: "Veg Biryani", category: "Lunch", description: "Fragrant basmati rice with vegetables and raita.", calories: 520, protein: 13, price: 125, isVeg: true, image: image("photo-1563379091339-03246963d51a") },
-  { id: 6, name: "Rajma Chawal", category: "Lunch", description: "Slow-cooked rajma with steamed rice and salad.", calories: 480, protein: 17, price: 110, isVeg: true, image: image("photo-1546833999-b9f581a1996d") },
-  { id: 7, name: "Paneer Butter Masala + Roti", category: "Lunch", description: "Paneer in tomato gravy with two whole-wheat rotis.", calories: 560, protein: 21, price: 135, isVeg: true, image: image("photo-1631452180519-c014fe946bc7") },
-  { id: 8, name: "Dal Khichdi", category: "Lunch", description: "Comforting rice and lentils with pickle and papad.", calories: 390, protein: 15, price: 95, isVeg: true, image: image("photo-1601050690597-df0568f70950") },
-  { id: 9, name: "South Indian Thali", category: "Lunch", description: "Rice, sambar, rasam, vegetables and papad.", calories: 610, protein: 19, price: 150, isVeg: true, image: image("photo-1630383249896-424e482df921") },
-  { id: 10, name: "Fruit Bowl", category: "Snacks", description: "Fresh seasonal fruit finished with lime.", calories: 160, protein: 3, price: 65, isVeg: true, image: image("photo-1490474418585-ba9bad8fd0ea") },
-  { id: 11, name: "Sprouts Chaat", category: "Snacks", description: "Moong sprouts with onion, tomato and chaat masala.", calories: 190, protein: 11, price: 60, isVeg: true, image: image("photo-1540420773420-3366772f4999") },
-  { id: 12, name: "Dhokla", category: "Snacks", description: "Yellow steamed dhokla with green chutney.", calories: 210, protein: 8, price: 50, isVeg: true, image: image("photo-1601050690597-df0568f70950") },
-  { id: 13, name: "Samosa", category: "Snacks", description: "Two crisp samosas with mint chutney.", calories: 280, protein: 5, price: 35, isVeg: true, image: image("photo-1601050690117-94f5f6fa8bd7") },
+const plates: { name: Appetite; hint: string }[] = [
+  { name: "Light", hint: "Smaller plate" },
+  { name: "Regular", hint: "Standard serving" },
+  { name: "Heavy", hint: "Fuller plate" },
 ];
 
-export default function TodaysMenuPage() {
-  const { bookings, appetitePreference, setAppetitePreference, selectMeal, saveWeeklyPlan, planSaved } = useBookings();
-  const [selectedDay, setSelectedDay] = useState<Weekday>("Monday");
-  const [smartPlateItem, setSmartPlateItem] = useState<MenuItem | null>(null);
-  const [smartPlateAppetite, setSmartPlateAppetite] = useState<Appetite>(appetitePreference);
-  const mealsForCategory = (category: MealCategory) => menuItems.filter((item) => item.category === category);
-  const dayBookings = useMemo(() => bookings.filter((booking) => booking.day === selectedDay), [bookings, selectedDay]);
-  const completedCount = bookings.length;
+/**
+ * The day to open on.
+ *
+ * The page used to always open on Monday, so on a Thursday the first thing an
+ * employee saw was a day they had already eaten. The ordered planning week
+ * always starts at the next bookable service day, so opening on its first entry
+ * lands on today when today is still bookable.
+ */
+function defaultDay(days: Weekday[]): Weekday {
+  return days[0];
+}
 
-  return <div className="page-frame menu-page"><div className="page-intro"><div><span className="eyebrow">WEEKLY MEAL PLAN · REDMOND CAFETERIA</span><h1>Weekly Meal Planner</h1><p>Choose one breakfast, lunch and snack for each workday. Weekends are closed.</p></div><button type="button" className="primary-button" onClick={saveWeeklyPlan}><Save size={16} /> Save Weekly Plan</button></div><div className="week-strip" aria-label="Choose a weekday">{weekdays.map((day) => <button type="button" className={selectedDay === day ? "selected" : ""} onClick={() => setSelectedDay(day)} key={day}><span>{day.slice(0, 3)}</span><small>{bookings.filter((booking) => booking.day === day).length}/3 selected</small></button>)}<button type="button" className="disabled-day" disabled><LockKeyhole size={15} /><span>Sat</span><small>Office Closed</small></button><button type="button" className="disabled-day" disabled><LockKeyhole size={15} /><span>Sun</span><small>Office Closed</small></button></div><div className="plan-progress"><span><strong>{completedCount} of 15 meals selected</strong><small>{planSaved ? "Weekly plan saved" : "Select one meal in each category"}</small></span><i><em style={{ width: `${(completedCount / 15) * 100}%` }} /></i></div><div className="schedule-heading"><div><span className="eyebrow">{selectedDay.toUpperCase()}</span><h2>Choose your cafeteria meals</h2></div><ChevronRight size={19} /></div><div className="schedule-sections">{categories.map((category) => { const selected = dayBookings.find((booking) => booking.category === category)?.item.id; return <section className="schedule-section" key={category}><div className="category-heading"><span className="category-marker"><Sparkles size={15} /></span><div><h3>{category}</h3><p>Choose one {category.toLowerCase()} for {selectedDay}.</p></div>{selected && <span className="category-complete"><Check size={13} /> Selected</span>}</div><div className="menu-grid">{mealsForCategory(category).map((item) => <WeeklyMealCard item={item} selected={selected === item.id} onSelect={() => { setSmartPlateItem(item); setSmartPlateAppetite(appetitePreference); }} key={item.id} />)}</div></section>; })}</div>{smartPlateItem && <SmartPlate item={smartPlateItem} appetite={smartPlateAppetite} onChange={setSmartPlateAppetite} onCancel={() => setSmartPlateItem(null)} onConfirm={() => { setAppetitePreference(smartPlateAppetite); selectMeal(selectedDay, smartPlateItem.category as MealCategory, smartPlateItem, smartPlateAppetite); setSmartPlateItem(null); }} />}{planSaved && <div className="success-toast" role="status"><span><Check size={18} /></span><div><strong>Weekly plan saved</strong><small>Your cafeteria bookings are ready for the week.</small></div></div>}</div>;
+/** "Thu 14 Aug", for the day strip. */
+function shortDate(iso: string) {
+  const parsed = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+}
+
+export default function TodaysMenuPage() {
+  const { bookings, appetitePreference, selectMeal, removeMeal, serviceDateFor, hydrated } = useBookings();
+  const { items, advice, state, reload, recommendedPlate } = useMenu();
+
+  const weekdays = useMemo(plannedWeekdays, []);
+  const today = useMemo(() => defaultDay(weekdays), [weekdays]);
+  const [selectedDay, setSelectedDay] = useState<Weekday>(today);
+  /** The booked card whose plate picker is open. Null means none. */
+  const [platePickerFor, setPlatePickerFor] = useState<MealCategory | null>(null);
+  const [pendingRemoval, setPendingRemoval] = useState<{ category: MealCategory; dish: string } | null>(null);
+  /** The dish just booked, so the card can acknowledge the tap. */
+  const [justBooked, setJustBooked] = useState<string | null>(null);
+  const ackTimer = useRef<number | null>(null);
+
+  const dayBookings = useMemo(
+    () => new Map(bookings.filter((booking) => booking.day === selectedDay).map((booking) => [booking.category, booking])),
+    [bookings, selectedDay]
+  );
+
+  const acknowledge = (dish: string) => {
+    setJustBooked(dish);
+    if (ackTimer.current) window.clearTimeout(ackTimer.current);
+    ackTimer.current = window.setTimeout(() => setJustBooked(null), 1600);
+  };
+
+  /** One tap: book the dish at the recommended plate and let autosave carry it. */
+  const bookDish = (category: MealCategory, item: MenuItem) => {
+    selectMeal(selectedDay, category, item, recommendedPlate(item.name, appetitePreference));
+    acknowledge(item.name);
+    setPlatePickerFor(null);
+  };
+
+  const changePlate = (category: MealCategory, item: MenuItem, plate: Appetite) => {
+    selectMeal(selectedDay, category, item, plate);
+    setPlatePickerFor(null);
+  };
+
+  const confirmRemoval = () => {
+    if (pendingRemoval) removeMeal(selectedDay, pendingRemoval.category);
+    setPendingRemoval(null);
+  };
+
+  const plannedDays = new Set(bookings.map((booking) => booking.day)).size;
+
+  return (
+    <div className="page-frame employee-booking">
+      <div className="page-intro">
+        <div>
+          <span className="eyebrow">MY WEEK</span>
+          <h1>Book your meals</h1>
+          <p>Tap a dish to book it. Your plan saves by itself — there is no submit button to remember.</p>
+        </div>
+        <div className="plan-progress" aria-label={`${plannedDays} of 5 workdays planned`}>
+          <strong>{plannedDays}/5</strong>
+          <small>days planned</small>
+        </div>
+      </div>
+
+      <PlanSyncStatus />
+
+      <nav className="day-strip" aria-label="Choose a day">
+        {weekdays.map((day) => {
+          const count = bookings.filter((booking) => booking.day === day).length;
+          const serviceDate = serviceDateFor(day);
+          const isToday = serviceDate === todayKey();
+          return (
+            <button
+              key={day}
+              type="button"
+              className={`day-chip${day === selectedDay ? " selected" : ""}`}
+              onClick={() => setSelectedDay(day)}
+              aria-current={day === selectedDay ? "true" : undefined}
+            >
+              <span className="day-chip-name">
+                {day.slice(0, 3)}
+                {isToday && <em>Today</em>}
+              </span>
+              <small>{shortDate(serviceDate)}</small>
+              <b className={count ? "has-meals" : ""}>{count ? `${count} booked` : "Nothing yet"}</b>
+            </button>
+          );
+        })}
+      </nav>
+
+      {(state === "loading" || !hydrated) && (
+        <div className="menu-loading" aria-busy="true" aria-live="polite">
+          <span className="visually-hidden">Loading today’s menu</span>
+          {categories.map((category) => (
+            <div className="meal-group" key={category}>
+              <LoadingSkeleton className="skeleton-heading" />
+              <div className="dish-picker-grid">
+                {[0, 1, 2].map((index) => (
+                  <LoadingSkeleton className="skeleton-card" key={index} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {state === "error" && (
+        <ErrorState
+          title="We could not load the menu"
+          message="The cafeteria service is not responding, so we cannot show you what is being cooked. Your existing bookings are safe."
+          onRetry={reload}
+        />
+      )}
+
+      {state === "ready" && hydrated && items.length === 0 && (
+        <EmptyState
+          icon={UtensilsCrossed}
+          title="No menu published yet"
+          message="The cafeteria has not published dishes for this week. Check back later today."
+        />
+      )}
+
+      {state === "ready" &&
+        hydrated &&
+        items.length > 0 &&
+        categories.map((category) => {
+          const choices = items.filter((item) => item.category === category);
+          if (choices.length === 0) return null;
+          const booked = dayBookings.get(category);
+          /**
+           * The booked dish is already shown in full above the picker, so
+           * repeating it in the grid made the same meal appear twice in one
+           * group -- on a phone the two cards were often the only two visible,
+           * which read as a double booking. The grid is therefore the list of
+           * dishes you could switch to.
+           */
+          const alternatives = booked ? choices.filter((item) => item.name !== booked.item.name) : choices;
+
+          return (
+            <div className="meal-group" key={category}>
+              <div className="meal-group-heading">
+                <h2>{category}</h2>
+                {booked ? (
+                  <span className="meal-group-status booked">
+                    <Check size={14} /> Booked
+                  </span>
+                ) : (
+                  <span className="meal-group-status">Not booked</span>
+                )}
+              </div>
+
+              {booked && (
+                <article className="booked-meal">
+                  <DishImage src={booked.item.image} />
+                  <div className="booked-meal-body">
+                    <strong>{booked.item.name}</strong>
+                    <small>
+                      {booked.appetite} plate · {booked.item.calories} kcal · {booked.item.protein}g protein
+                    </small>
+                    {/**
+                     * The tap acknowledgement. It lives on the booked card
+                     * because the booked dish is no longer in the grid below,
+                     * and it is announced so a screen-reader user gets the same
+                     * confirmation a sighted one does.
+                     */}
+                    {justBooked === booked.item.name && (
+                      <span className="booked-meal-ack" role="status">
+                        <Check size={13} /> Added to your week
+                      </span>
+                    )}
+                    {platePickerFor === category ? (
+                      <div className="plate-picker" role="group" aria-label="Choose your plate size">
+                        {plates.map((plate) => (
+                          <button
+                            key={plate.name}
+                            type="button"
+                            className={`plate-chip${booked.appetite === plate.name ? " selected" : ""}`}
+                            onClick={() => changePlate(category, booked.item, plate.name)}
+                          >
+                            <strong>{plate.name}</strong>
+                            <small>{plate.hint}</small>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="booked-meal-actions">
+                        <button type="button" className="link-button" onClick={() => setPlatePickerFor(category)}>
+                          Change plate size
+                        </button>
+                        <button
+                          type="button"
+                          className="link-button danger"
+                          onClick={() => setPendingRemoval({ category, dish: booked.item.name })}
+                        >
+                          <Trash2 size={14} /> Remove
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </article>
+              )}
+
+              <div className="dish-picker-grid">
+                {alternatives.map((item) => {
+                  const tip = advice.get(item.name);
+                  return (
+                    <button
+                      key={item.name}
+                      type="button"
+                      className="dish-picker-card"
+                      onClick={() => bookDish(category, item)}
+                    >
+                      <DishImage src={item.image} />
+                      <span className="dish-picker-body">
+                        <strong>{item.name}</strong>
+                        <small>{item.description}</small>
+                        <span className="dish-picker-meta">
+                          {item.calories} kcal · {item.protein}g protein
+                        </span>
+                        {tip?.measured && (
+                          <span className="dish-picker-tip" title={tip.reason}>
+                            <Sparkles size={12} /> {tip.recommendedPlate} plate suits most people
+                          </span>
+                        )}
+                      </span>
+                      <span className="dish-picker-action">
+                        {booked ? (
+                          <>
+                            Switch to this <ChevronRight size={15} />
+                          </>
+                        ) : (
+                          <>
+                            Book <ChevronRight size={15} />
+                          </>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
+      {state === "ready" && hydrated && items.length > 0 && (
+        <div className="booking-footer-nav">
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => setSelectedDay(weekdays[Math.max(0, weekdays.indexOf(selectedDay) - 1)])}
+            disabled={weekdays.indexOf(selectedDay) === 0}
+          >
+            <ChevronLeft size={15} /> Previous day
+          </button>
+          <button
+            type="button"
+            className="order-button"
+            onClick={() => setSelectedDay(weekdays[Math.min(weekdays.length - 1, weekdays.indexOf(selectedDay) + 1)])}
+            disabled={weekdays.indexOf(selectedDay) === weekdays.length - 1}
+          >
+            Next day <ChevronRight size={15} />
+          </button>
+        </div>
+      )}
+
+      <p className="booking-privacy">
+        <AlertCircle size={14} /> Your plan is shared with the kitchen as a count only. Nobody sees what you personally
+        booked.
+      </p>
+
+      {pendingRemoval && (
+        <ConfirmDialog
+          title={`Remove ${pendingRemoval.dish}?`}
+          message={`This cancels your ${pendingRemoval.category.toLowerCase()} booking for ${selectedDay} and tells the kitchen to cook one less. You can book again any time before service.`}
+          confirmLabel="Remove meal"
+          cancelLabel="Keep it"
+          onConfirm={confirmRemoval}
+          onCancel={() => setPendingRemoval(null)}
+        />
+      )}
+    </div>
+  );
 }

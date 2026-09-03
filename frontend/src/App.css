@@ -161,3 +161,114 @@ button { cursor: pointer; }
 .dark-mode .ops-section, .dark-mode .ops-risk-card { border-color: var(--line); background: var(--surface); }.dark-mode .ops-evidence-card { background: #333; }.dark-mode .ops-evidence-card strong, .dark-mode .ops-risk-card strong, .dark-mode .ops-section-head h2, .dark-mode .ops-table .ops-emphasis { color: var(--ink); }
 @media (max-width: 900px) { .ops-risk-row, .ops-evidence-grid { grid-template-columns: 1fr; }.ops-split { grid-template-columns: 1fr; } }
 .risk-unrated { color: #5c5c5c; background: #eeeeee; }.ops-risk-card.risk-unrated strong { color: var(--muted); }.ops-pill.risk-unrated { color: #5c5c5c; background: #efefef; }.ops-table td small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }.dark-mode .risk-unrated, .dark-mode .ops-pill.risk-unrated { color: #cfcfcf; background: #3a3a3a; }
+
+
+/* ---------------------------------------------------------------------------
+   Employee UX pass.
+
+   Sized for a phone first. Every tappable element here clears 44px so the
+   booking flow works one-handed at a counter, which is where it is actually
+   used, rather than only at a desk.
+   --------------------------------------------------------------------------- */
+
+/* Shared empty and error states. */
+.ux-empty-state { display: grid; justify-items: center; gap: 8px; margin: 14px 0; padding: 34px 22px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--subtle); text-align: center; }.ux-empty-state strong { font-size: 16px; }.ux-empty-state p { max-width: 46ch; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }.ux-state-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; color: var(--blue); background: #e8f3fc; }.ux-empty-state .primary-button, .ux-empty-state .secondary-button { margin-top: 6px; }
+.ux-error-state { border-style: solid; border-color: #f0c9c4; background: #fdf0ef; }.ux-error-state .ux-state-icon { color: #b3261e; background: #fdecea; }.ux-error-state strong { color: #b3261e; }
+
+/* Loading skeletons. */
+.loading-skeleton { display: block; border-radius: 10px; background: linear-gradient(90deg, var(--subtle) 25%, rgba(0,0,0,.06) 37%, var(--subtle) 63%); background-size: 400% 100%; animation: skeleton-sweep 1.3s ease infinite; }
+.skeleton-heading { width: 180px; height: 20px; margin-bottom: 12px; }.skeleton-line { width: 100%; height: 14px; margin: 6px 0; }.skeleton-card { height: 190px; }.skeleton-metric { height: 92px; }
+@keyframes skeleton-sweep { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+@media (prefers-reduced-motion: reduce) { .loading-skeleton { animation: none; } }
+
+/* Whether the kitchen has the plan. */
+.plan-sync { display: flex; align-items: center; gap: 11px; margin: 14px 0; padding: 12px 15px; border: 1px solid var(--line); border-radius: 13px; background: var(--subtle); font-size: 12px; }.plan-sync svg { flex: 0 0 auto; color: var(--muted); }.plan-sync span { display: grid; gap: 2px; flex: 1; min-width: 0; }.plan-sync strong { font-size: 12px; font-weight: 600; }.plan-sync small { color: var(--muted); font-size: 11px; line-height: 1.5; }.plan-sync .secondary-button { flex: 0 0 auto; min-height: 38px; padding: 8px 14px; font-size: 12px; }
+.plan-sync-ok { border-color: #bfe0c8; background: #eef8f1; }.plan-sync-ok svg, .plan-sync-ok strong { color: #1c5c34; }
+.plan-sync-error { border-color: #f0c9c4; background: #fdf0ef; }.plan-sync-error svg, .plan-sync-error strong { color: #b3261e; }
+.spin { animation: plan-sync-spin 1s linear infinite; }
+@keyframes plan-sync-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+/* Destructive confirmation. */
+.confirm-dialog { display: grid; justify-items: start; gap: 10px; max-width: 430px; text-align: left; }.confirm-dialog h2 { margin: 0; font-size: 20px; }.confirm-dialog p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }.confirm-dialog-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: #b3261e; background: #fdecea; }.confirm-dialog .modal-actions { width: 100%; margin-top: 8px; }
+.danger-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 11px 20px; border: 0; border-radius: 10px; color: #fff; background: #b3261e; font-size: 14px; font-weight: 600; cursor: pointer; }.danger-button:hover { background: #8f1d17; }.danger-button:focus-visible { outline: 2px solid #b3261e; outline-offset: 2px; }
+
+/* Booking: the day strip. */
+.employee-booking .plan-progress { display: grid; justify-items: center; gap: 1px; padding: 11px 18px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }.plan-progress strong { color: var(--blue-dark); font-size: 21px; line-height: 1; }.plan-progress small { color: var(--muted); font-size: 10px; }.plan-progress.compact { padding: 7px 13px; }.plan-progress.compact strong { font-size: 16px; }
+.day-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 16px 0 22px; }
+.day-chip { display: grid; gap: 3px; min-height: 68px; padding: 10px 8px; border: 1px solid var(--line); border-radius: 13px; background: #fff; text-align: left; cursor: pointer; transition: border-color .15s ease, background .15s ease; }.day-chip:hover { border-color: var(--blue); }.day-chip.selected { border-color: var(--blue); background: #e8f3fc; }.day-chip:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.day-chip-name { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; }.day-chip-name em { padding: 2px 6px; border-radius: 99px; color: var(--blue-dark); background: #d4e9f9; font-size: 9px; font-style: normal; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }.day-chip small { color: var(--muted); font-size: 10px; }.day-chip b { color: var(--muted); font-size: 10px; font-weight: 600; }.day-chip b.has-meals { color: var(--green); }
+
+/* Booking: dish choices. */
+.meal-group { margin-bottom: 26px; }.meal-group-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 11px; }.meal-group-heading h2 { margin: 0; font-size: 17px; }.meal-group-status { color: var(--muted); font-size: 11px; font-weight: 600; }.meal-group-status.booked { display: inline-flex; align-items: center; gap: 5px; color: var(--green); }
+.booked-meal { display: flex; gap: 13px; margin-bottom: 13px; padding: 13px; border: 1px solid #bfe0c8; border-radius: var(--radius); background: #f2faf5; }.booked-meal img { flex: 0 0 auto; width: 64px; height: 64px; border-radius: 11px; object-fit: cover; }.booked-meal-body { display: grid; align-content: start; gap: 3px; min-width: 0; }.booked-meal-body strong { font-size: 15px; }.booked-meal-body small { color: var(--muted); font-size: 11px; }.booked-meal-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
+.link-button { display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 0; border: 0; background: none; color: var(--blue); font-size: 12px; font-weight: 600; cursor: pointer; }.link-button:hover { text-decoration: underline; }.link-button:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }.link-button.danger { color: #b3261e; }
+.plate-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }.plate-chip { display: grid; gap: 1px; min-width: 96px; min-height: 44px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 10px; background: #fff; text-align: left; cursor: pointer; }.plate-chip strong { font-size: 13px; }.plate-chip small { color: var(--muted); font-size: 10px; }.plate-chip.selected { border-color: var(--blue); background: #e8f3fc; }.plate-chip:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.dish-picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 13px; }
+.dish-picker-card { display: grid; grid-template-rows: auto 1fr auto; gap: 0; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; text-align: left; cursor: pointer; transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease; }.dish-picker-card:hover { transform: translateY(-3px); border-color: var(--blue); box-shadow: var(--shadow); }.dish-picker-card:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }.dish-picker-card.selected { border-color: var(--green); box-shadow: 0 0 0 1px var(--green) inset; }
+.dish-picker-card > img { width: 100%; height: 122px; object-fit: cover; }
+.dish-picker-body { display: grid; align-content: start; gap: 4px; padding: 12px 14px; }.dish-picker-body strong { font-size: 15px; }.dish-picker-body small { color: var(--muted); font-size: 11px; line-height: 1.5; }.dish-picker-meta { color: var(--muted); font-size: 11px; font-weight: 600; }
+.dish-picker-tip { display: inline-flex; align-items: center; gap: 5px; margin-top: 3px; color: var(--blue-dark); font-size: 10px; font-weight: 600; }
+.dish-picker-action { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 11px; border-top: 1px solid var(--line); color: var(--blue); font-size: 13px; font-weight: 600; }.dish-picker-card.selected .dish-picker-action { color: var(--green); background: #f2faf5; }
+.booking-footer-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; }.booking-footer-nav button:disabled { opacity: .45; cursor: not-allowed; }
+.booking-privacy { display: flex; align-items: center; gap: 8px; margin: 22px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }.booking-privacy svg { flex: 0 0 auto; }
+.menu-loading .meal-group { margin-bottom: 22px; }
+
+/* Home: today, week, up next, smart plate, impact. */
+.home-today { margin-top: 6px; }
+.today-meal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 13px; }
+.today-meal-card { display: flex; gap: 13px; padding: 13px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }.today-meal-card img { flex: 0 0 auto; width: 62px; height: 62px; border-radius: 11px; object-fit: cover; }.today-meal-card > div { display: grid; align-content: start; gap: 3px; min-width: 0; }.today-meal-card strong { font-size: 15px; }.today-meal-card small { color: var(--muted); font-size: 11px; }
+.home-columns { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-top: 22px; align-items: start; }
+.home-side { display: grid; gap: 16px; align-content: start; }
+.home-panel { padding: 20px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }.home-panel h2 { margin: 0 0 4px; font-size: 18px; }.home-panel p { margin: 0; font-size: 13px; line-height: 1.6; }.home-panel .muted { color: var(--muted); font-size: 12px; }
+.week-plan-list { display: grid; gap: 2px; margin: 10px 0 0; padding: 0; list-style: none; }.week-plan-list li { display: grid; grid-template-columns: 116px 1fr; gap: 12px; align-items: center; padding: 11px 10px; border-radius: 10px; }.week-plan-list li.is-today { background: #e8f3fc; }
+.week-plan-day { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }.week-plan-day em { padding: 2px 6px; border-radius: 99px; color: var(--blue-dark); background: #d4e9f9; font-size: 9px; font-style: normal; font-weight: 700; text-transform: uppercase; }
+.week-plan-meals { display: flex; flex-wrap: wrap; gap: 6px; }.week-plan-meals b { padding: 4px 10px; border-radius: 99px; background: var(--subtle); font-size: 11px; font-weight: 600; }
+.week-plan-empty { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; color: var(--blue); font-size: 12px; font-weight: 600; text-decoration: none; }.week-plan-empty:hover { text-decoration: underline; }
+.home-upcoming .upcoming-dish { display: block; margin: 8px 0 4px; color: var(--blue-dark); font-size: 21px; line-height: 1.25; }.home-upcoming p { color: var(--muted); font-size: 12px; }.home-upcoming .secondary-button { margin-top: 14px; }
+.home-smart-plate .smart-plate-icon { display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 10px; border-radius: 12px; color: #8a4b08; background: #fdf4e6; }.home-smart-plate p { margin-top: 6px; }.home-smart-plate small { display: block; margin-top: 7px; font-size: 11px; line-height: 1.6; }
+.home-impact { margin-top: 22px; }.impact-basis { margin: 14px 0 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
+
+/* Bookings list. */
+.history-day { margin-bottom: 22px; }.history-day-heading { margin: 0 0 10px; color: var(--blue); font-size: 11px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; }.history-item-content h3 { margin: 0 0 4px; font-size: 16px; }.add-more-link { display: inline-flex; }
+.profile-preference { display: grid; gap: 14px; margin-bottom: 16px; padding: 20px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }.profile-preference > div:first-child { display: flex; align-items: center; gap: 13px; }.profile-preference small { display: block; color: var(--muted); font-size: 11px; }.profile-preference strong { font-size: 13px; font-weight: 600; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Dark mode. */
+.dark-mode .ux-empty-state { border-color: var(--line); background: var(--surface); }.dark-mode .ux-state-icon { background: #2a3b47; }.dark-mode .ux-error-state { border-color: #6b2f2a; background: #3a2422; }.dark-mode .plan-sync { border-color: var(--line); background: var(--surface); }.dark-mode .plan-sync-ok { background: #24352a; }.dark-mode .plan-sync-error { background: #3a2422; }
+.dark-mode .day-chip, .dark-mode .home-panel, .dark-mode .today-meal-card, .dark-mode .dish-picker-card, .dark-mode .plate-chip, .dark-mode .plan-progress, .dark-mode .profile-preference { border-color: var(--line); background: var(--surface); }.dark-mode .day-chip.selected, .dark-mode .plate-chip.selected, .dark-mode .week-plan-list li.is-today { background: #2a3b47; }.dark-mode .booked-meal { border-color: #2f5a3d; background: #24352a; }.dark-mode .dish-picker-card.selected .dish-picker-action { background: #24352a; }.dark-mode .week-plan-meals b { background: #333; }.dark-mode .home-upcoming .upcoming-dish { color: var(--ink); }
+.dark-mode .loading-skeleton { background: linear-gradient(90deg, #333 25%, #3d3d3d 37%, #333 63%); background-size: 400% 100%; }
+
+/* Tablet. */
+@media (max-width: 1000px) { .home-columns { grid-template-columns: 1fr; }.dish-picker-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+
+/* Phone. The day strip scrolls horizontally rather than crushing five columns
+   into a 360px screen, and the week list stacks so day names are not clipped. */
+@media (max-width: 720px) { .day-strip { display: flex; gap: 8px; margin-inline: -18px; padding-inline: 18px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }.day-chip { flex: 0 0 128px; scroll-snap-align: start; }.dish-picker-grid, .today-meal-grid { grid-template-columns: 1fr; }.week-plan-list li { grid-template-columns: 1fr; gap: 6px; }.employee-booking .plan-progress { width: 100%; }.plan-sync { flex-wrap: wrap; }.plan-sync .secondary-button { width: 100%; }.booking-footer-nav { flex-direction: column-reverse; }.booking-footer-nav button { width: 100%; } }
+@media (max-width: 480px) { .home-panel { padding: 17px 16px; }.ux-empty-state { padding: 26px 16px; }.booked-meal { flex-direction: column; }.booked-meal img { width: 100%; height: 120px; }.plate-picker { display: grid; grid-template-columns: 1fr; }.plate-chip { min-width: 0; }.confirm-dialog .modal-actions { grid-template-columns: 1fr; }.dish-picker-card > img { height: 148px; } }
+/* A dish photo that failed to load. Sized by the same rules as the img it replaces. */
+.dish-image-fallback { display: flex; align-items: center; justify-content: center; background: var(--surface-alt, #eef1f5); color: var(--muted, #6b7280); border-radius: 10px; flex-shrink: 0; }
+.today-meal-card .dish-image-fallback, .history-item .dish-image-fallback, .booked-meal .dish-image-fallback { width: 64px; height: 64px; }
+.dish-picker-card .dish-image-fallback { width: 100%; height: 104px; border-radius: 10px 10px 0 0; }
+[data-theme="dark"] .dish-image-fallback { background: #262b33; color: #8b95a5; }
+.meal-feedback-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--muted, #6b7280);
+}
+.booked-meal-ack {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: fit-content;
+}

@@ -96,8 +96,15 @@ export function getMyFeedback(employeeId: string) {
   );
 }
 
+/**
+ * Admin-only calls carry the shared administrator token. These two routes read
+ * cafeteria-wide aggregates and are never reached from an employee screen.
+ */
+const ADMIN_TOKEN = "zerowaste-local-admin-token";
+const adminHeaders = () => ({ "x-admin-token": ADMIN_TOKEN });
+
 export function getFeedbackAnalytics() {
-  return axios.get<FeedbackAnalytics>(`${API_BASE}/admin/analytics/feedback`);
+  return axios.get<FeedbackAnalytics>(`${API_BASE}/admin/analytics/feedback`, { headers: adminHeaders() });
 }
 
 export function getPipeline(bookings: number) {
@@ -106,5 +113,5 @@ export function getPipeline(bookings: number) {
 
 /** Per-dish portion guidance, already redacted for thin samples by the server. */
 export function getPortionSignals() {
-  return axios.get<PortionSignals>(`${API_BASE}/admin/analytics/signals`);
+  return axios.get<PortionSignals>(`${API_BASE}/admin/analytics/signals`, { headers: adminHeaders() });
 }

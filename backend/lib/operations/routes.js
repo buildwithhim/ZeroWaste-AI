@@ -18,6 +18,8 @@ const { buildAccuracyReport } = require("./accuracy");
 const { buildEsgReport } = require("./esg");
 const { readRoster, saveRoster } = require("./roster");
 const { listMenu } = require("./menu");
+const { buildPortionAdvice } = require("./portionAdvice");
+const { buildPersonalImpact } = require("./personalImpact");
 const { todayKey } = require("./serviceDate");
 
 const adminRouter = express.Router();
@@ -90,6 +92,23 @@ adminRouter.get("/service", (req, res) => {
 
 /** The dish catalogue. Public: it is the menu, not operational data. */
 publicRouter.get("/menu", (req, res) => res.json({ menu: listMenu() }));
+
+/**
+ * Smart Plate advice. Public because it is a serving suggestion, and aggregate
+ * only -- see portionAdvice for why every bucket is threshold-checked here even
+ * though the planner may read thin buckets internally.
+ */
+publicRouter.get("/portion-advice", (req, res) => res.json(buildPortionAdvice()));
+
+/**
+ * One employee's own impact. Self-service only: it is keyed by the caller's
+ * pseudonym and returns nothing about anybody else.
+ */
+publicRouter.get("/impact/me", (req, res) => {
+  const employeeId = req.query.employeeId;
+  if (!employeeId) return res.status(400).json({ error: "employeeId is required" });
+  res.json(buildPersonalImpact(employeeId));
+});
 
 /**
  * An employee saves their weekly plan. Rejected lines are reported rather than

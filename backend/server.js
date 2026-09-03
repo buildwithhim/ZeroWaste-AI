@@ -9,6 +9,7 @@ const { buildAdminReport } = require("./lib/analytics");
 const { refreshSignals, readSignals, toPublicSignals } = require("./lib/signals");
 const { buildPipeline } = require("./lib/pipeline");
 const { menuFamilyFor } = require("./lib/menuTaxonomy");
+const { adminGate } = require("./lib/requireAdmin");
 const invoiceRoutes = require("./lib/invoices/routes");
 const { adminRouter: operationsAdminRoutes, publicRouter: operationsPublicRoutes } = require("./lib/operations/routes");
 
@@ -135,8 +136,13 @@ app.get("/feedback/me", (req, res) => {
  *
  * This route reads raw rows but returns only the aggregate report. There is
  * deliberately no endpoint anywhere that lists individual responses to an admin.
+ *
+ * Guarded like the rest of /admin. Sitting under the /admin prefix is a naming
+ * convention, not a control: without the gate these two routes were reachable
+ * by anyone who knew the path, which put an admin-only surface one fetch away
+ * from the employee bundle.
  */
-app.get("/admin/analytics/feedback", (req, res) => {
+app.get("/admin/analytics/feedback", adminGate("Administrator access is required for feedback analytics"), (req, res) => {
   try {
     res.json(buildAdminReport(feedbackStore.listAll()));
   } catch (error) {
@@ -150,7 +156,7 @@ app.get("/admin/analytics/feedback", (req, res) => {
  * threshold are stripped — see toPublicSignals for why the on-disk document
  * must not be served directly.
  */
-app.get("/admin/analytics/signals", (req, res) => {
+app.get("/admin/analytics/signals", adminGate("Administrator access is required for learning signals"), (req, res) => {
   const fallback = { version: 1, totalResponses: 0, global: { portionMultiplier: 1 }, byDish: {}, byMenuFamily: {}, byWeekday: {}, weeklyTrend: [] };
   res.json(toPublicSignals(readSignals()) ?? fallback);
 });

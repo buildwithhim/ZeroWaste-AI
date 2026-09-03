@@ -167,7 +167,12 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
         weekday: booking.day,
         portionSize: booking.appetite,
         response,
-        servedOn: serviceDateFor(booking.day),
+        // The booking's own service date, never a recomputed one. Deriving it
+        // here resolved the weekday backwards while the booking had resolved it
+        // forwards, so a rating for tomorrow's Friday lunch was filed against
+        // last Friday -- it never joined its booking, and it landed in the wrong
+        // week's signal bucket.
+        servedOn: booking.servedOn || serviceDateFor(booking.day),
         submittedAt: new Date().toISOString(),
         synced: false,
       };

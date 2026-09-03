@@ -25,7 +25,10 @@ export default function App() {
   return <Routes>
     <Route path="/" element={<HomeRedirect />} />
     <Route path="/login" element={<LoginPage />} />
-    <Route element={<ProtectedRoute allowedRole="employee" />}><Route path="/employee" element={<EmployeeDashboard />}><Route index element={<EmployeeHomePage />} /><Route path="menu" element={<TodaysMenuPage />} /><Route path="orders" element={<OrderHistoryPage />} /><Route path="history" element={<OrderHistoryPage />} /><Route path="profile" element={<ProfilePage />} /></Route></Route>
+    {/* `history` redirects rather than mounting a second copy of the page: two
+        live routes to the same screen meant two URLs an employee could be on,
+        only one of which the navigation ever highlighted. */}
+    <Route element={<ProtectedRoute allowedRole="employee" />}><Route path="/employee" element={<EmployeeDashboard />}><Route index element={<EmployeeHomePage />} /><Route path="menu" element={<TodaysMenuPage />} /><Route path="orders" element={<OrderHistoryPage />} /><Route path="history" element={<Navigate to="/employee/orders" replace />} /><Route path="profile" element={<ProfilePage />} /></Route></Route>
     <Route element={<ProtectedRoute allowedRole="admin" />}><Route path="/admin" element={<AdminDashboard />}><Route index element={<AdminOverviewPage />} /><Route path="kitchen" element={<KitchenPage />} /><Route path="analytics" element={<AnalyticsPage />} /><Route path="pipeline" element={<DataPipelinePage />} /><Route path="invoices" element={<InvoiceSyncPage />} /><Route path="esg" element={<EsgImpactPage />} /></Route></Route>
     <Route path="*" element={<NotFound />} />
   </Routes>;

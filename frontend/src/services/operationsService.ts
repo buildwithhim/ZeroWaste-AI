@@ -21,6 +21,9 @@ const authHeaders = () => ({ "x-admin-token": ADMIN_TOKEN });
 
 export type MealCategory = "Breakfast" | "Lunch" | "Snacks";
 
+/** Plate sizes an employee can pick. Mirrors PLATE_SIZES in portionAdvice.js. */
+export type Appetite = "Light" | "Regular" | "Heavy";
+
 /**
  * "Unrated" is a real state, not a missing value: a dish the kitchen has not
  * closed out often enough has no measured waste history, and inventing a
@@ -33,6 +36,60 @@ export type MenuItem = {
   category: MealCategory;
   menuFamily: string;
   portionKg: number;
+  description: string;
+  calories: number;
+  protein: number;
+  price: number;
+  isVeg: boolean;
+  image: string;
+};
+
+export type PlateSize = { name: Appetite; grams: number; multiplier: number; description: string };
+
+/**
+ * Smart Plate advice for one dish.
+ *
+ * `measured` is the field the UI must branch on. It separates a suggestion the
+ * feedback loop actually learned from the standard serving used when too few
+ * people have rated the dish, so the interface never labels a default as a
+ * recommendation.
+ */
+export type PortionAdvice = {
+  dish: string;
+  recommendedPlate: Appetite;
+  measured: boolean;
+  basis: "dish" | "menu-family" | "cafeteria" | "none";
+  responses: number;
+  reason: string;
+};
+
+export type PortionAdviceReport = { plateSizes: PlateSize[]; minSample: number; advice: PortionAdvice[] };
+
+/**
+ * One employee's own impact. Computed server-side against the same conversion
+ * factors as the ESG report, so the personal and cafeteria-wide views agree.
+ *
+ * The percentage fields are nullable on purpose: "has not rated a meal yet" is
+ * a different statement from "finishes 0% of meals".
+ */
+export type PersonalImpact = {
+  meals: number;
+  /** Bookings inside the current planning week, which is what `daysPlanned` measures. */
+  mealsThisWeek: number;
+  daysPlanned: number;
+  ratedMeals: number;
+  finishedMeals: number;
+  finishedSharePercent: number | null;
+  leftoverSharePercent: number | null;
+  plannedKg: number;
+  leftKg: number;
+  savedKg: number;
+  co2eSavedKg: number;
+  waterSavedLitres: number;
+  costSavedInr: number;
+  /** What the personal figure is a share of, so the panel can show its working. */
+  basis: { cafeteriaSavedKg: number; totalRatings: number; sharePercent: number; explanation: string };
+  factors: { co2eKgPerKg: number; waterLitresPerKg: number; costInrPerKg: number; mealKg: number; basis: string };
 };
 
 /** The headline answer to "how much should the cafeteria prepare today?". */
@@ -293,7 +350,28 @@ export function getMenu() {
   return axios.get<{ menu: MenuItem[] }>(`${API_BASE}/operations/menu`);
 }
 
+/** A booking as the server stores it. Identity is already stripped on return. */
+export type StoredBooking = {
+  id: string;
+  dish: string;
+  category: MealCategory;
+  appetite: Appetite;
+  servedOn: string;
+  weekday: string;
+  bookedAt: string;
+};
+
 /** Reads back only this employee's own bookings. */
 export function getMyBookings(employeeId: string) {
-  return axios.get<{ bookings: BookingInput[] }>(`${API_BASE}/operations/bookings/me`, { params: { employeeId } });
+  return axios.get<{ bookings: StoredBooking[] }>(`${API_BASE}/operations/bookings/me`, { params: { employeeId } });
+}
+
+/** Smart Plate advice. Public and aggregate-only — no admin token required. */
+export function getPortionAdvice() {
+  return axios.get<PortionAdviceReport>(`${API_BASE}/operations/portion-advice`);
+}
+
+/** This employee's own impact. Self-service: returns nothing about anyone else. */
+export function getMyImpact(employeeId: string) {
+  return axios.get<PersonalImpact>(`${API_BASE}/operations/impact/me`, { params: { employeeId } });
 }

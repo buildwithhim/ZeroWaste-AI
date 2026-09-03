@@ -99162,36 +99162,6 @@
       "bookedAt": "2026-09-03T08:15:00.000Z"
     },
     {
-      "id": "2026-09-03-Breakfast-192",
-      "employeeHash": "a27651367d5bac8e",
-      "dish": "Poha",
-      "category": "Breakfast",
-      "appetite": "Regular",
-      "servedOn": "2026-09-03",
-      "weekday": "Thursday",
-      "bookedAt": "2026-09-03T08:15:00.000Z"
-    },
-    {
-      "id": "2026-09-03-Lunch-192",
-      "employeeHash": "a27651367d5bac8e",
-      "dish": "Veg Biryani",
-      "category": "Lunch",
-      "appetite": "Regular",
-      "servedOn": "2026-09-03",
-      "weekday": "Thursday",
-      "bookedAt": "2026-09-03T08:15:00.000Z"
-    },
-    {
-      "id": "2026-09-03-Snacks-192",
-      "employeeHash": "a27651367d5bac8e",
-      "dish": "Fruit Bowl",
-      "category": "Snacks",
-      "appetite": "Regular",
-      "servedOn": "2026-09-03",
-      "weekday": "Thursday",
-      "bookedAt": "2026-09-03T08:15:00.000Z"
-    },
-    {
       "id": "2026-09-03-Lunch-193",
       "employeeHash": "e80172cad527af81",
       "dish": "Rajma Chawal",
@@ -102730,6 +102700,56 @@
       "servedOn": "2026-09-03",
       "weekday": "Thursday",
       "bookedAt": "2026-09-03T06:46:13.471Z"
+    },
+    {
+      "id": "bca187f1-23da-41da-aa9d-8c5caec74076",
+      "employeeHash": "8bd92244cf481513",
+      "dish": "Idli Sambar",
+      "category": "Breakfast",
+      "appetite": "Regular",
+      "servedOn": "2026-09-03",
+      "weekday": "Thursday",
+      "bookedAt": "2026-09-03T09:15:17.676Z"
+    },
+    {
+      "id": "37e72b7a-4479-4c6f-b339-c4cb528f3fd4",
+      "employeeHash": "a27651367d5bac8e",
+      "dish": "Veg Biryani",
+      "category": "Lunch",
+      "appetite": "Light",
+      "servedOn": "2026-09-03",
+      "weekday": "Thursday",
+      "bookedAt": "2026-09-03T09:49:57.101Z"
+    },
+    {
+      "id": "06264e55-afbe-4b02-8a28-aed574db2352",
+      "employeeHash": "a27651367d5bac8e",
+      "dish": "Sprouts Chaat",
+      "category": "Snacks",
+      "appetite": "Regular",
+      "servedOn": "2026-09-03",
+      "weekday": "Thursday",
+      "bookedAt": "2026-09-03T09:49:57.101Z"
+    },
+    {
+      "id": "088efa8e-a7c0-4980-a1f1-552fe7ea5a0b",
+      "employeeHash": "a27651367d5bac8e",
+      "dish": "Idli Sambar",
+      "category": "Breakfast",
+      "appetite": "Regular",
+      "servedOn": "2026-09-03",
+      "weekday": "Thursday",
+      "bookedAt": "2026-09-03T09:49:57.101Z"
+    },
+    {
+      "id": "f060787e-1ae7-493b-973e-6fa21cd8d680",
+      "employeeHash": "27b2a18c82aff724",
+      "dish": "Idli Sambar",
+      "category": "Breakfast",
+      "appetite": "Regular",
+      "servedOn": "2026-09-03",
+      "weekday": "Thursday",
+      "bookedAt": "2026-09-03T09:51:14.404Z"
     }
   ]
 }
