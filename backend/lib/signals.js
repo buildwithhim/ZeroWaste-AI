@@ -131,6 +131,13 @@ function toPublicSignals(signals) {
     byDish: redact(signals.byDish),
     byMenuFamily: redact(signals.byMenuFamily),
     byWeekday: redact(signals.byWeekday),
+    // The cafeteria-wide bucket is redacted on the same threshold. It is an
+    // aggregate, but an aggregate over one or two people is still those people:
+    // below the threshold the reported rates are simply their own answers.
+    global:
+      signals.totalResponses >= MIN_DISH_SAMPLE
+        ? signals.global
+        : { responses: signals.totalResponses || 0, suppressed: true },
     weeklyTrend: (signals.weeklyTrend || []).filter((week) => week.responses >= MIN_DISH_SAMPLE),
   };
 }

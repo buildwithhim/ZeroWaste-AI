@@ -77,10 +77,8 @@ def safe_encode(encoder, value, fallback_index=0):
     return fallback_index
 
 
-def main():
-    weekday = sys.argv[1] if len(sys.argv) > 1 else "Friday"
-    menu = sys.argv[2] if len(sys.argv) > 2 else "Biryani"
-
+def predict_one(weekday, menu):
+    """Model prediction plus the feedback adjustment for one weekday/menu pair."""
     features = pd.DataFrame(
         {
             "weekday": [safe_encode(day_encoder, weekday)],
@@ -97,21 +95,57 @@ def main():
     # Confidence rises with the volume of feedback backing the adjustment.
     confidence = 94 if responses == 0 else min(99, 88 + round(responses / (responses + 12.0) * 11))
 
-    print(
-        json.dumps(
-            {
-                "prediction": base_prediction,
-                "basePrediction": base_prediction,
-                "portionMultiplier": round(multiplier, 3),
-                "recommendedServings": recommended_servings,
-                "feedbackResponses": responses,
-                "feedbackApplied": responses > 0 and multiplier != 1.0,
-                "adjustmentReason": reason,
-                "confidence": int(confidence),
-            }
-        )
-    )
+    return {
+        "weekday": weekday,
+        "menu": menu,
+        "prediction": base_prediction,
+        "basePrediction": base_prediction,
+        "portionMultiplier": round(multiplier, 3),
+        "recommendedServings": recommended_servings,
+        "feedbackResponses": responses,
+        "feedbackApplied": responses > 0 and multiplier != 1.0,
+        "adjustmentReason": reason,
+        "confidence": int(confidence),
+    }
+
+
+def run_batch():
+    """Dish-level planning needs one forecast per menu family on the board.
+
+    Spawning a Python process per dish would mean re-loading the model and both
+    encoders a dozen times to render a single page, so the batch path takes a
+    JSON array of {weekday, menu} pairs on stdin and answers them all from the
+    one already-loaded model.
+    """
+    try:
+        requests = json.loads(sys.stdin.read() or "[]")
+    except ValueError as error:
+        print(json.dumps({"error": "invalid JSON on stdin: {0}".format(error)}))
+        return 1
+
+    if not isinstance(requests, list):
+        print(json.dumps({"error": "expected a JSON array of {weekday, menu} objects"}))
+        return 1
+
+    results = []
+    for item in requests:
+        if not isinstance(item, dict):
+            continue
+        results.append(predict_one(item.get("weekday") or "Friday", item.get("menu") or "Biryani"))
+
+    print(json.dumps({"predictions": results}))
+    return 0
+
+
+def main():
+    if "--batch" in sys.argv[1:]:
+        return run_batch()
+
+    weekday = sys.argv[1] if len(sys.argv) > 1 else "Friday"
+    menu = sys.argv[2] if len(sys.argv) > 2 else "Biryani"
+    print(json.dumps(predict_one(weekday, menu)))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

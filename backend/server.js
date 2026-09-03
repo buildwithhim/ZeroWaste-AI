@@ -10,6 +10,7 @@ const { refreshSignals, readSignals, toPublicSignals } = require("./lib/signals"
 const { buildPipeline } = require("./lib/pipeline");
 const { menuFamilyFor } = require("./lib/menuTaxonomy");
 const invoiceRoutes = require("./lib/invoices/routes");
+const { adminRouter: operationsAdminRoutes, publicRouter: operationsPublicRoutes } = require("./lib/operations/routes");
 
 const app = express();
 app.use(cors());
@@ -21,6 +22,20 @@ app.use(express.json());
  * data.
  */
 app.use("/admin/invoices", invoiceRoutes);
+
+/**
+ * Cafeteria operations. The admin half answers "how much should we cook today"
+ * and is gated inside its own router; the public half carries the menu and an
+ * employee's own bookings, which is why it is mounted separately rather than
+ * behind the same guard.
+ *
+ * Both halves sit under an /operations prefix. The public half was briefly
+ * mounted at "/", which silently broke booking sync — the client posted to
+ * /operations/bookings and got the 404 handler, so every saved meal plan was
+ * dropped and the admin's pre-booking count never moved.
+ */
+app.use("/admin/operations", operationsAdminRoutes);
+app.use("/operations", operationsPublicRoutes);
 
 const PORT = process.env.PORT || 5000;
 const pythonPath = process.env.PYTHON_PATH || path.join(__dirname, "..", ".venv", "Scripts", "python.exe");

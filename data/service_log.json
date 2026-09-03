@@ -1,0 +1,1643 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Masala Dosa",
+      "cookedPortions": 69,
+      "servedPortions": 64,
+      "leftoverPortions": 5,
+      "leftoverKg": 1.4,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 74,
+      "servedPortions": 74,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 42,
+      "servedPortions": 34,
+      "leftoverPortions": 8,
+      "leftoverKg": 1.28,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 52,
+      "servedPortions": 49,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 44,
+      "servedPortions": 44,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Veg Biryani",
+      "cookedPortions": 146,
+      "servedPortions": 142,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Dhokla",
+      "cookedPortions": 62,
+      "servedPortions": 50,
+      "leftoverPortions": 12,
+      "leftoverKg": 1.92,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Idli Sambar",
+      "cookedPortions": 74,
+      "servedPortions": 68,
+      "leftoverPortions": 6,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "South Indian Thali",
+      "cookedPortions": 40,
+      "servedPortions": 37,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 39,
+      "servedPortions": 39,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Samosa",
+      "cookedPortions": 46,
+      "servedPortions": 41,
+      "leftoverPortions": 5,
+      "leftoverKg": 0.8,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Poha",
+      "cookedPortions": 39,
+      "servedPortions": 37,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-14",
+      "dish": "Upma",
+      "cookedPortions": 41,
+      "servedPortions": 36,
+      "leftoverPortions": 5,
+      "leftoverKg": 1.4,
+      "recordedAt": "2026-08-14T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 60,
+      "servedPortions": 56,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Dhokla",
+      "cookedPortions": 40,
+      "servedPortions": 37,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.48,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Veg Biryani",
+      "cookedPortions": 143,
+      "servedPortions": 118,
+      "leftoverPortions": 25,
+      "leftoverKg": 10.5,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "South Indian Thali",
+      "cookedPortions": 38,
+      "servedPortions": 34,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 43,
+      "servedPortions": 37,
+      "leftoverPortions": 6,
+      "leftoverKg": 2.52,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Poha",
+      "cookedPortions": 44,
+      "servedPortions": 42,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 52,
+      "servedPortions": 49,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.48,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Masala Dosa",
+      "cookedPortions": 56,
+      "servedPortions": 56,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 73,
+      "servedPortions": 68,
+      "leftoverPortions": 5,
+      "leftoverKg": 2.1,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 40,
+      "servedPortions": 40,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Samosa",
+      "cookedPortions": 36,
+      "servedPortions": 30,
+      "leftoverPortions": 6,
+      "leftoverKg": 0.96,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Idli Sambar",
+      "cookedPortions": 52,
+      "servedPortions": 52,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-17",
+      "dish": "Upma",
+      "cookedPortions": 25,
+      "servedPortions": 24,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.28,
+      "recordedAt": "2026-08-17T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 93,
+      "servedPortions": 86,
+      "leftoverPortions": 7,
+      "leftoverKg": 2.94,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 34,
+      "servedPortions": 29,
+      "leftoverPortions": 5,
+      "leftoverKg": 0.8,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Masala Dosa",
+      "cookedPortions": 59,
+      "servedPortions": 53,
+      "leftoverPortions": 6,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Veg Biryani",
+      "cookedPortions": 104,
+      "servedPortions": 97,
+      "leftoverPortions": 7,
+      "leftoverKg": 2.94,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Upma",
+      "cookedPortions": 23,
+      "servedPortions": 22,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.28,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Idli Sambar",
+      "cookedPortions": 65,
+      "servedPortions": 65,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "South Indian Thali",
+      "cookedPortions": 41,
+      "servedPortions": 41,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Samosa",
+      "cookedPortions": 42,
+      "servedPortions": 39,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.48,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 62,
+      "servedPortions": 55,
+      "leftoverPortions": 7,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Poha",
+      "cookedPortions": 47,
+      "servedPortions": 47,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 77,
+      "servedPortions": 75,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 47,
+      "servedPortions": 47,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-18",
+      "dish": "Dhokla",
+      "cookedPortions": 43,
+      "servedPortions": 39,
+      "leftoverPortions": 4,
+      "leftoverKg": 0.64,
+      "recordedAt": "2026-08-18T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 47,
+      "servedPortions": 45,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Masala Dosa",
+      "cookedPortions": 66,
+      "servedPortions": 57,
+      "leftoverPortions": 9,
+      "leftoverKg": 2.52,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 72,
+      "servedPortions": 72,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Dhokla",
+      "cookedPortions": 40,
+      "servedPortions": 36,
+      "leftoverPortions": 4,
+      "leftoverKg": 0.64,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 52,
+      "servedPortions": 52,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Veg Biryani",
+      "cookedPortions": 130,
+      "servedPortions": 117,
+      "leftoverPortions": 13,
+      "leftoverKg": 5.46,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Idli Sambar",
+      "cookedPortions": 64,
+      "servedPortions": 54,
+      "leftoverPortions": 10,
+      "leftoverKg": 2.8,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "South Indian Thali",
+      "cookedPortions": 28,
+      "servedPortions": 26,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Upma",
+      "cookedPortions": 37,
+      "servedPortions": 31,
+      "leftoverPortions": 6,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Samosa",
+      "cookedPortions": 30,
+      "servedPortions": 30,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Poha",
+      "cookedPortions": 42,
+      "servedPortions": 40,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 77,
+      "servedPortions": 61,
+      "leftoverPortions": 16,
+      "leftoverKg": 6.72,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-19",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 47,
+      "servedPortions": 43,
+      "leftoverPortions": 4,
+      "leftoverKg": 0.64,
+      "recordedAt": "2026-08-19T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Veg Biryani",
+      "cookedPortions": 115,
+      "servedPortions": 113,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Dhokla",
+      "cookedPortions": 43,
+      "servedPortions": 43,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Poha",
+      "cookedPortions": 37,
+      "servedPortions": 36,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.28,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 54,
+      "servedPortions": 53,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.42,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "South Indian Thali",
+      "cookedPortions": 37,
+      "servedPortions": 37,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Masala Dosa",
+      "cookedPortions": 50,
+      "servedPortions": 44,
+      "leftoverPortions": 6,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 52,
+      "servedPortions": 52,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 39,
+      "servedPortions": 37,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.32,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 86,
+      "servedPortions": 74,
+      "leftoverPortions": 12,
+      "leftoverKg": 5.04,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Samosa",
+      "cookedPortions": 38,
+      "servedPortions": 38,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Upma",
+      "cookedPortions": 29,
+      "servedPortions": 29,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 56,
+      "servedPortions": 48,
+      "leftoverPortions": 8,
+      "leftoverKg": 1.28,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-20",
+      "dish": "Idli Sambar",
+      "cookedPortions": 58,
+      "servedPortions": 50,
+      "leftoverPortions": 8,
+      "leftoverKg": 2.24,
+      "recordedAt": "2026-08-20T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Veg Biryani",
+      "cookedPortions": 127,
+      "servedPortions": 121,
+      "leftoverPortions": 6,
+      "leftoverKg": 2.52,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 54,
+      "servedPortions": 52,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.32,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 88,
+      "servedPortions": 71,
+      "leftoverPortions": 17,
+      "leftoverKg": 7.14,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Idli Sambar",
+      "cookedPortions": 58,
+      "servedPortions": 58,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Samosa",
+      "cookedPortions": 34,
+      "servedPortions": 31,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.48,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 87,
+      "servedPortions": 70,
+      "leftoverPortions": 17,
+      "leftoverKg": 7.14,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Poha",
+      "cookedPortions": 46,
+      "servedPortions": 42,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 37,
+      "servedPortions": 33,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Masala Dosa",
+      "cookedPortions": 69,
+      "servedPortions": 55,
+      "leftoverPortions": 14,
+      "leftoverKg": 3.92,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "South Indian Thali",
+      "cookedPortions": 41,
+      "servedPortions": 40,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.42,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Dhokla",
+      "cookedPortions": 32,
+      "servedPortions": 28,
+      "leftoverPortions": 4,
+      "leftoverKg": 0.64,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Upma",
+      "cookedPortions": 30,
+      "servedPortions": 26,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-21",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 44,
+      "servedPortions": 37,
+      "leftoverPortions": 7,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-21T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Masala Dosa",
+      "cookedPortions": 63,
+      "servedPortions": 59,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 48,
+      "servedPortions": 43,
+      "leftoverPortions": 5,
+      "leftoverKg": 2.1,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Dhokla",
+      "cookedPortions": 36,
+      "servedPortions": 32,
+      "leftoverPortions": 4,
+      "leftoverKg": 0.64,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Idli Sambar",
+      "cookedPortions": 74,
+      "servedPortions": 68,
+      "leftoverPortions": 6,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Veg Biryani",
+      "cookedPortions": 141,
+      "servedPortions": 115,
+      "leftoverPortions": 26,
+      "leftoverKg": 10.92,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 58,
+      "servedPortions": 58,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "South Indian Thali",
+      "cookedPortions": 36,
+      "servedPortions": 33,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Samosa",
+      "cookedPortions": 45,
+      "servedPortions": 43,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.32,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 37,
+      "servedPortions": 37,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Upma",
+      "cookedPortions": 34,
+      "servedPortions": 29,
+      "leftoverPortions": 5,
+      "leftoverKg": 1.4,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 87,
+      "servedPortions": 87,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 57,
+      "servedPortions": 51,
+      "leftoverPortions": 6,
+      "leftoverKg": 0.96,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-24",
+      "dish": "Poha",
+      "cookedPortions": 44,
+      "servedPortions": 40,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-24T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 72,
+      "servedPortions": 67,
+      "leftoverPortions": 5,
+      "leftoverKg": 2.1,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Upma",
+      "cookedPortions": 24,
+      "servedPortions": 24,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 73,
+      "servedPortions": 61,
+      "leftoverPortions": 12,
+      "leftoverKg": 5.04,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Samosa",
+      "cookedPortions": 39,
+      "servedPortions": 33,
+      "leftoverPortions": 6,
+      "leftoverKg": 0.96,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Veg Biryani",
+      "cookedPortions": 130,
+      "servedPortions": 119,
+      "leftoverPortions": 11,
+      "leftoverKg": 4.62,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Poha",
+      "cookedPortions": 50,
+      "servedPortions": 48,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 46,
+      "servedPortions": 46,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "South Indian Thali",
+      "cookedPortions": 36,
+      "servedPortions": 33,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Idli Sambar",
+      "cookedPortions": 64,
+      "servedPortions": 60,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Masala Dosa",
+      "cookedPortions": 46,
+      "servedPortions": 46,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Dhokla",
+      "cookedPortions": 48,
+      "servedPortions": 39,
+      "leftoverPortions": 9,
+      "leftoverKg": 1.44,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 49,
+      "servedPortions": 42,
+      "leftoverPortions": 7,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-25",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 37,
+      "servedPortions": 37,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-25T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 45,
+      "servedPortions": 44,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.42,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Masala Dosa",
+      "cookedPortions": 72,
+      "servedPortions": 59,
+      "leftoverPortions": 13,
+      "leftoverKg": 3.64,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Veg Biryani",
+      "cookedPortions": 115,
+      "servedPortions": 115,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "South Indian Thali",
+      "cookedPortions": 33,
+      "servedPortions": 32,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.42,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 71,
+      "servedPortions": 68,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Dhokla",
+      "cookedPortions": 44,
+      "servedPortions": 41,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.48,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 86,
+      "servedPortions": 77,
+      "leftoverPortions": 9,
+      "leftoverKg": 3.78,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Samosa",
+      "cookedPortions": 36,
+      "servedPortions": 36,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Upma",
+      "cookedPortions": 35,
+      "servedPortions": 31,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 54,
+      "servedPortions": 54,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Idli Sambar",
+      "cookedPortions": 60,
+      "servedPortions": 58,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 41,
+      "servedPortions": 40,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.16,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-26",
+      "dish": "Poha",
+      "cookedPortions": 35,
+      "servedPortions": 33,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-26T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Masala Dosa",
+      "cookedPortions": 52,
+      "servedPortions": 49,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Veg Biryani",
+      "cookedPortions": 124,
+      "servedPortions": 103,
+      "leftoverPortions": 21,
+      "leftoverKg": 8.82,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 57,
+      "servedPortions": 50,
+      "leftoverPortions": 7,
+      "leftoverKg": 2.94,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Dhokla",
+      "cookedPortions": 40,
+      "servedPortions": 39,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.16,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 83,
+      "servedPortions": 79,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Upma",
+      "cookedPortions": 36,
+      "servedPortions": 31,
+      "leftoverPortions": 5,
+      "leftoverKg": 1.4,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Idli Sambar",
+      "cookedPortions": 54,
+      "servedPortions": 54,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 61,
+      "servedPortions": 58,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 61,
+      "servedPortions": 61,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "South Indian Thali",
+      "cookedPortions": 29,
+      "servedPortions": 26,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 44,
+      "servedPortions": 40,
+      "leftoverPortions": 4,
+      "leftoverKg": 0.64,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Samosa",
+      "cookedPortions": 30,
+      "servedPortions": 30,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-27",
+      "dish": "Poha",
+      "cookedPortions": 32,
+      "servedPortions": 29,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-27T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Upma",
+      "cookedPortions": 26,
+      "servedPortions": 24,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 74,
+      "servedPortions": 72,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Masala Dosa",
+      "cookedPortions": 68,
+      "servedPortions": 58,
+      "leftoverPortions": 10,
+      "leftoverKg": 2.8,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Poha",
+      "cookedPortions": 51,
+      "servedPortions": 49,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Veg Biryani",
+      "cookedPortions": 125,
+      "servedPortions": 125,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 52,
+      "servedPortions": 51,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.16,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Idli Sambar",
+      "cookedPortions": 52,
+      "servedPortions": 47,
+      "leftoverPortions": 5,
+      "leftoverKg": 1.4,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 75,
+      "servedPortions": 75,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Samosa",
+      "cookedPortions": 35,
+      "servedPortions": 35,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "South Indian Thali",
+      "cookedPortions": 38,
+      "servedPortions": 35,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Dhokla",
+      "cookedPortions": 36,
+      "servedPortions": 36,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 44,
+      "servedPortions": 36,
+      "leftoverPortions": 8,
+      "leftoverKg": 1.28,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-28",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 40,
+      "servedPortions": 39,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.42,
+      "recordedAt": "2026-08-28T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "South Indian Thali",
+      "cookedPortions": 44,
+      "servedPortions": 43,
+      "leftoverPortions": 1,
+      "leftoverKg": 0.42,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Dhokla",
+      "cookedPortions": 37,
+      "servedPortions": 35,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.32,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Masala Dosa",
+      "cookedPortions": 63,
+      "servedPortions": 53,
+      "leftoverPortions": 10,
+      "leftoverKg": 2.8,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 86,
+      "servedPortions": 72,
+      "leftoverPortions": 14,
+      "leftoverKg": 5.88,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Veg Biryani",
+      "cookedPortions": 138,
+      "servedPortions": 132,
+      "leftoverPortions": 6,
+      "leftoverKg": 2.52,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 76,
+      "servedPortions": 70,
+      "leftoverPortions": 6,
+      "leftoverKg": 2.52,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Idli Sambar",
+      "cookedPortions": 71,
+      "servedPortions": 71,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Samosa",
+      "cookedPortions": 39,
+      "servedPortions": 34,
+      "leftoverPortions": 5,
+      "leftoverKg": 0.8,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 42,
+      "servedPortions": 38,
+      "leftoverPortions": 4,
+      "leftoverKg": 0.64,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Poha",
+      "cookedPortions": 43,
+      "servedPortions": 43,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 48,
+      "servedPortions": 43,
+      "leftoverPortions": 5,
+      "leftoverKg": 2.1,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 39,
+      "servedPortions": 39,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-08-31",
+      "dish": "Upma",
+      "cookedPortions": 34,
+      "servedPortions": 31,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-08-31T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 43,
+      "servedPortions": 39,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.68,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 44,
+      "servedPortions": 41,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.48,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Upma",
+      "cookedPortions": 28,
+      "servedPortions": 25,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Veg Biryani",
+      "cookedPortions": 141,
+      "servedPortions": 127,
+      "leftoverPortions": 14,
+      "leftoverKg": 5.88,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 64,
+      "servedPortions": 61,
+      "leftoverPortions": 3,
+      "leftoverKg": 1.26,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 54,
+      "servedPortions": 49,
+      "leftoverPortions": 5,
+      "leftoverKg": 0.8,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Idli Sambar",
+      "cookedPortions": 62,
+      "servedPortions": 59,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Masala Dosa",
+      "cookedPortions": 63,
+      "servedPortions": 59,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 83,
+      "servedPortions": 66,
+      "leftoverPortions": 17,
+      "leftoverKg": 7.14,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Samosa",
+      "cookedPortions": 34,
+      "servedPortions": 29,
+      "leftoverPortions": 5,
+      "leftoverKg": 0.8,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Dhokla",
+      "cookedPortions": 41,
+      "servedPortions": 38,
+      "leftoverPortions": 3,
+      "leftoverKg": 0.48,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "South Indian Thali",
+      "cookedPortions": 37,
+      "servedPortions": 32,
+      "leftoverPortions": 5,
+      "leftoverKg": 2.1,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-01",
+      "dish": "Poha",
+      "cookedPortions": 37,
+      "servedPortions": 37,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-09-01T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Rajma Chawal",
+      "cookedPortions": 91,
+      "servedPortions": 91,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Fruit Bowl",
+      "cookedPortions": 62,
+      "servedPortions": 54,
+      "leftoverPortions": 8,
+      "leftoverKg": 1.28,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Veg Biryani",
+      "cookedPortions": 107,
+      "servedPortions": 107,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Idli Sambar",
+      "cookedPortions": 75,
+      "servedPortions": 71,
+      "leftoverPortions": 4,
+      "leftoverKg": 1.12,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "South Indian Thali",
+      "cookedPortions": 39,
+      "servedPortions": 39,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Sprouts Chaat",
+      "cookedPortions": 38,
+      "servedPortions": 32,
+      "leftoverPortions": 6,
+      "leftoverKg": 0.96,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Poha",
+      "cookedPortions": 47,
+      "servedPortions": 45,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.56,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Paneer Butter Masala + Roti",
+      "cookedPortions": 74,
+      "servedPortions": 63,
+      "leftoverPortions": 11,
+      "leftoverKg": 4.62,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Masala Dosa",
+      "cookedPortions": 55,
+      "servedPortions": 55,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Samosa",
+      "cookedPortions": 44,
+      "servedPortions": 38,
+      "leftoverPortions": 6,
+      "leftoverKg": 0.96,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Dal Khichdi",
+      "cookedPortions": 56,
+      "servedPortions": 54,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.84,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Dhokla",
+      "cookedPortions": 41,
+      "servedPortions": 39,
+      "leftoverPortions": 2,
+      "leftoverKg": 0.32,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    },
+    {
+      "servedOn": "2026-09-02",
+      "dish": "Upma",
+      "cookedPortions": 21,
+      "servedPortions": 21,
+      "leftoverPortions": 0,
+      "leftoverKg": 0,
+      "recordedAt": "2026-09-02T15:30:00.000Z"
+    }
+  ]
+}

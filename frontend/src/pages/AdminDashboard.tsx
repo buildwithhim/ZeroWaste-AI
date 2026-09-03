@@ -1,31 +1,20 @@
-import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
+
 import FluentLayout from "../layout/FluentLayout";
-import { getForecast, type Forecast } from "../services/forecastService";
 
-export type AdminOutletContext = { forecast: Forecast; isLoading: boolean };
-
-/** Used until the backend responds, and if it is unreachable. */
-const defaultForecast: Forecast = {
-  predictedOrders: 337,
-  basePredictedOrders: 337,
-  recommendedServings: 337,
-  portionMultiplier: 1,
-  feedbackResponses: 0,
-  feedbackApplied: false,
-  adjustmentReason: "Forecast service unavailable",
-  confidence: 94,
-  foodSavedKg: 18,
-  workerMeals: 36,
-};
-
+/**
+ * Admin shell.
+ *
+ * This used to fetch a forecast and hand every admin page a fallback object
+ * full of invented figures -- 337 orders, 94% confidence, 18 kg saved -- which
+ * rendered indistinguishably from real data whenever the backend was slow or
+ * down. Each page now loads exactly the operational data it needs and says so
+ * when that data is unavailable.
+ */
 export default function AdminDashboard() {
-  const [forecast, setForecast] = useState<Forecast>(defaultForecast);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    getForecast().then(({ data }) => setForecast(data)).catch(() => setForecast(defaultForecast)).finally(() => setIsLoading(false));
-  }, []);
-
-  return <FluentLayout role="admin"><Outlet context={{ forecast, isLoading } satisfies AdminOutletContext} /></FluentLayout>;
+  return (
+    <FluentLayout role="admin">
+      <Outlet />
+    </FluentLayout>
+  );
 }
