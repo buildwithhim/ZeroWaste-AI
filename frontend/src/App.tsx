@@ -4,6 +4,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminOverviewPage from "./pages/AdminOverviewPage";
 import KitchenPage from "./pages/KitchenPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import DataPipelinePage from "./pages/DataPipelinePage";
 import InvoiceSyncPage from "./pages/InvoiceSyncPage";
 import EsgImpactPage from "./pages/EsgImpactPage";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
@@ -25,7 +26,7 @@ export default function App() {
     <Route path="/" element={<HomeRedirect />} />
     <Route path="/login" element={<LoginPage />} />
     <Route element={<ProtectedRoute allowedRole="employee" />}><Route path="/employee" element={<EmployeeDashboard />}><Route index element={<EmployeeHomePage />} /><Route path="menu" element={<TodaysMenuPage />} /><Route path="orders" element={<OrderHistoryPage />} /><Route path="history" element={<OrderHistoryPage />} /><Route path="profile" element={<ProfilePage />} /></Route></Route>
-    <Route element={<ProtectedRoute allowedRole="admin" />}><Route path="/admin" element={<AdminDashboard />}><Route index element={<AdminOverviewPage />} /><Route path="kitchen" element={<KitchenPage />} /><Route path="analytics" element={<AnalyticsPage />} /><Route path="invoices" element={<InvoiceSyncPage />} /><Route path="esg" element={<EsgImpactPage />} /></Route></Route>
+    <Route element={<ProtectedRoute allowedRole="admin" />}><Route path="/admin" element={<AdminDashboard />}><Route index element={<AdminOverviewPage />} /><Route path="kitchen" element={<KitchenPage />} /><Route path="analytics" element={<AnalyticsPage />} /><Route path="pipeline" element={<DataPipelinePage />} /><Route path="invoices" element={<InvoiceSyncPage />} /><Route path="esg" element={<EsgImpactPage />} /></Route></Route>
     <Route path="*" element={<NotFound />} />
   </Routes>;
 }

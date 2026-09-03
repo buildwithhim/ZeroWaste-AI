@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, CalendarDays, FileUp, LayoutDashboard, Leaf, LogOut, Menu, Moon, Settings, Sun, Users, X } from "lucide-react";
+import { BarChart3, CalendarDays, FileUp, LayoutDashboard, Leaf, LogOut, Menu, Moon, Settings, Sun, Users, Workflow, X } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth, type Role } from "../context/AuthContext";
 
@@ -8,7 +8,7 @@ type FluentLayoutProps = { children: ReactNode; role: Role };
 
 const linksByRole = {
   employee: [{ label: "Home", to: "/employee", icon: LayoutDashboard }, { label: "Today's menu", to: "/employee/menu", icon: CalendarDays }, { label: "My Orders", to: "/employee/orders", icon: Users }, { label: "Profile", to: "/employee/profile", icon: Users }],
-    admin: [{ label: "Overview", to: "/admin", icon: LayoutDashboard }, { label: "Kitchen", to: "/admin/kitchen", icon: CalendarDays }, { label: "Analytics", to: "/admin/analytics", icon: BarChart3 }, { label: "Invoice Sync", to: "/admin/invoices", icon: FileUp }, { label: "ESG Report", to: "/admin/esg", icon: Leaf }],
+    admin: [{ label: "Overview", to: "/admin", icon: LayoutDashboard }, { label: "Kitchen", to: "/admin/kitchen", icon: CalendarDays }, { label: "Analytics", to: "/admin/analytics", icon: BarChart3 }, { label: "Data Pipeline", to: "/admin/pipeline", icon: Workflow }, { label: "Invoice Sync", to: "/admin/invoices", icon: FileUp }, { label: "ESG Report", to: "/admin/esg", icon: Leaf }],
 } satisfies Record<Role, { label: string; to: string; icon: typeof LayoutDashboard }[]>;
 
 export default function FluentLayout({ children, role }: FluentLayoutProps) {

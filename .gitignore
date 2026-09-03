@@ -13,6 +13,12 @@ build/
 # Environment
 .env
 
+# Runtime feedback data (regenerate with: npm run seed:feedback)
+data/feedback.json
+data/feedback.json.tmp
+data/feedback_signals.json
+data/feedback_signals.json.tmp
+
 # VS Code
 .vscode/
 
