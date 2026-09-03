@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed:feedback": "node scripts/seed_feedback.js",
+    "invoices:fixtures": "python scripts/make_test_invoice.py",
     "start:backend": "npm --prefix backend start"
   },
   "repository": {

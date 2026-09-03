@@ -9,10 +9,18 @@ const { buildAdminReport } = require("./lib/analytics");
 const { refreshSignals, readSignals, toPublicSignals } = require("./lib/signals");
 const { buildPipeline } = require("./lib/pipeline");
 const { menuFamilyFor } = require("./lib/menuTaxonomy");
+const invoiceRoutes = require("./lib/invoices/routes");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+/**
+ * SmartQ invoice ingestion. Mounted as a unit so the admin guard inside the
+ * router covers every invoice route; nothing outside this prefix reads invoice
+ * data.
+ */
+app.use("/admin/invoices", invoiceRoutes);
 
 const PORT = process.env.PORT || 5000;
 const pythonPath = process.env.PYTHON_PATH || path.join(__dirname, "..", ".venv", "Scripts", "python.exe");

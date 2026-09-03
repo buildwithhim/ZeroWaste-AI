@@ -19,6 +19,19 @@ data/feedback.json.tmp
 data/feedback_signals.json
 data/feedback_signals.json.tmp
 
+# SmartQ invoice ingestion runtime data.
+# The vault holds original invoice PDFs and must never be committed; the
+# database, import history and audit trail are per-environment state.
+data/invoice_vault/
+data/invoices.json
+data/invoices.json.tmp
+data/invoice_imports.json
+data/invoice_imports.json.tmp
+data/invoice_audit.log
+data/invoice_orders_dataset.csv
+data/invoice_orders_dataset.csv.tmp
+data/test_invoices/
+
 # VS Code
 .vscode/
 
