@@ -248,14 +248,19 @@ the model is built — but CI trains it, so the skip never hides a regression th
 
 `.github/workflows/tests.yml` runs on every push and pull request:
 
-1. **Backend** — Node 20, Python 3.11 venv, model trained, `npm --prefix backend test`
-2. **Frontend** — `npm --prefix frontend test`
+1. **Backend** — Node 24, Python 3.11 venv from `requirements.txt`, `npm --prefix backend run test:coverage`
+2. **Frontend** — `npm --prefix frontend test`, then `tsc --noEmit`
 3. **E2E** — both of the above must pass first; Playwright with Chromium
 4. **Audit** — `npm audit --omit=dev` on both packages, non-blocking, reported
 
-Merge is blocked on 1–3. Step 4 reports but does not block, because the two known
-moderate advisories (`qs` via `body-parser` via Express 5) have no upstream fix yet and
-would otherwise block every unrelated change.
+Merge is blocked on 1–3. Step 4 reports but does not block, because the known moderate
+advisory (`qs` via `body-parser` via Express 5) has no upstream fix yet and would
+otherwise block every unrelated change.
+
+**Node 24 is not arbitrary.** jsdom's bundled `undici` calls
+`webidl.util.markAsUncloneable`, which does not exist on Node 20 — the frontend suite
+fails to start a worker there, before running a single test. Lowering `NODE_VERSION`
+breaks CI in a way that looks nothing like a version problem.
 
 ---
 
