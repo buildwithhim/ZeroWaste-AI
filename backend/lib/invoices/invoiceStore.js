@@ -21,6 +21,7 @@ const fs = require("fs");
 const path = require("path");
 
 const { COMPARABLE_FIELDS } = require("./invoiceModel");
+const { objectStore } = require("../storage/objectStore");
 
 const { dataDir, dataPath } = require("../dataDir");
 
@@ -30,6 +31,11 @@ const storePath = () => dataPath("invoices.json");
  * Original PDFs live outside the web root and are never mounted as static
  * files; the only way out is the admin-guarded download route. Files are named
  * by content hash so a hostile upload name cannot influence the path.
+ *
+ * The bytes themselves now go through lib/storage/objectStore.js, which keeps
+ * this behaviour on a local disk and adds an S3-compatible driver for
+ * deployments where the container filesystem is neither shared nor durable.
+ * This path is still exported because tests and the local driver share it.
  */
 const vaultDir = () => dataPath("invoice_vault");
 
@@ -56,23 +62,21 @@ function writeStore(store) {
   fs.renameSync(tempPath, target);
 }
 
-/** Persists the original bytes. Returns the vault-relative name. */
-function storeRaw(buffer, contentHash) {
-  const vault = vaultDir();
-  fs.mkdirSync(vault, { recursive: true });
-  const target = path.join(vault, `${contentHash}.pdf`);
-  // Identical content is stored once; the hash guarantees the bytes match.
-  if (!fs.existsSync(target)) {
-    fs.writeFileSync(target, buffer, { mode: 0o600 });
-  }
-  return path.basename(target);
+/** Persists the original bytes. Returns the vault key. */
+async function storeRaw(buffer, contentHash) {
+  return objectStore().put(contentHash, buffer);
 }
 
-/** Reads an original back. The hash is validated to keep the path inside the vault. */
-function readRaw(contentHash) {
-  if (!/^[a-f0-9]{64}$/.test(String(contentHash || ""))) return null;
-  const target = path.join(vaultDir(), `${contentHash}.pdf`);
-  return fs.existsSync(target) ? fs.readFileSync(target) : null;
+/**
+ * Reads an original back.
+ *
+ * The hash is validated as 64 hex characters inside the object store, so a
+ * caller cannot steer the read outside the vault -- with the local driver that
+ * would be path traversal, and with the S3 driver it would be a crafted key
+ * concatenated into a request path.
+ */
+async function readRaw(contentHash) {
+  return objectStore().get(contentHash);
 }
 
 /** Field-by-field difference between a stored record and an incoming one. */

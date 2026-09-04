@@ -3,13 +3,29 @@ import axios from "axios";
 /**
  * Where the backend lives.
  *
- * Overridable through VITE_API_BASE so an end-to-end run can point the app at
- * a backend started on a spare port against a disposable data directory,
- * rather than at whatever happens to be on 5000 -- which during development is
- * a server writing into the repository's real `data/` folder. The default is
- * unchanged, so nothing about ordinary local development moves.
+ * Three cases, in priority order:
+ *
+ *   VITE_API_BASE   An explicit origin, baked in at build time. This is how a
+ *                   production image is built when the API is on a different
+ *                   host to the app, and how the end-to-end harness points the
+ *                   app at a backend on a spare port with a disposable data
+ *                   directory rather than at whatever is on 5000.
+ *
+ *   production      An empty string, meaning same-origin relative requests.
+ *                   The production image serves the app from nginx, which
+ *                   proxies /operations, /admin, /feedback and the rest to the
+ *                   backend, so the browser never learns a second origin. That
+ *                   also means no cross-origin request, so no CORS preflight
+ *                   on the hot path.
+ *
+ *   development     http://localhost:5000, the Express default. Unchanged, so
+ *                   nothing about running the app locally moves.
+ *
+ * The old code had the localhost URL as its only fallback, which meant a
+ * production build with VITE_API_BASE unset silently shipped an app that called
+ * the user's own machine.
  */
-export const API_BASE = import.meta.env?.VITE_API_BASE ?? "http://localhost:5000";
+export const API_BASE = import.meta.env?.VITE_API_BASE ?? (import.meta.env?.PROD ? "" : "http://localhost:5000");
 
 /** The four post-meal responses an employee can give. */
 export const FEEDBACK_RESPONSES = ["Finished", "Left some", "Left most", "Wanted more"] as const;

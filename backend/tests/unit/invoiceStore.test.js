@@ -277,28 +277,28 @@ describe("the invoice vault", () => {
   const sandbox = useDataSandbox();
   const bytes = Buffer.from("%PDF-1.7 original");
 
-  it("names files by content hash, so an uploaded name cannot steer the path", () => {
+  it("names files by content hash, so an uploaded name cannot steer the path", async () => {
     const hash = hashOf("vaulted");
-    expect(invoiceStore.storeRaw(bytes, hash)).toBe(`${hash}.pdf`);
+    expect(await invoiceStore.storeRaw(bytes, hash)).toBe(`${hash}.pdf`);
     expect(fs.existsSync(path.join(sandbox.dir, "invoice_vault", `${hash}.pdf`))).toBe(true);
   });
 
-  it("reads the original bytes back", () => {
+  it("reads the original bytes back", async () => {
     const hash = hashOf("vaulted");
-    invoiceStore.storeRaw(bytes, hash);
-    expect(invoiceStore.readRaw(hash)).toEqual(bytes);
+    await invoiceStore.storeRaw(bytes, hash);
+    expect(await invoiceStore.readRaw(hash)).toEqual(bytes);
   });
 
-  it("stores identical content once", () => {
+  it("stores identical content once", async () => {
     const hash = hashOf("vaulted");
-    invoiceStore.storeRaw(bytes, hash);
-    invoiceStore.storeRaw(bytes, hash);
+    await invoiceStore.storeRaw(bytes, hash);
+    await invoiceStore.storeRaw(bytes, hash);
 
     expect(fs.readdirSync(path.join(sandbox.dir, "invoice_vault"))).toHaveLength(1);
   });
 
-  it("returns nothing for a hash that was never stored", () => {
-    expect(invoiceStore.readRaw(hashOf("never-stored"))).toBeNull();
+  it("returns nothing for a hash that was never stored", async () => {
+    expect(await invoiceStore.readRaw(hashOf("never-stored"))).toBeNull();
   });
 
   describe("path traversal", () => {
@@ -320,8 +320,8 @@ describe("the invoice vault", () => {
       ["an absent segment", undefined],
     ];
 
-    it.each(attempts)("refuses %s", (_label, attempt) => {
-      expect(invoiceStore.readRaw(attempt)).toBeNull();
+    it.each(attempts)("refuses %s", async (_label, attempt) => {
+      expect(await invoiceStore.readRaw(attempt)).toBeNull();
     });
   });
 });

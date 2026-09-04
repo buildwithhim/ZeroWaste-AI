@@ -1,0 +1,137 @@
+# Production overlay.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# The base file is a development convenience: it runs a database and an object
+# store as containers, publishes ports on localhost, and supplies fallback
+# credentials so `docker compose up` works on a fresh clone. None of that is
+# appropriate in production, so this overlay removes it rather than editing it
+# -- keeping the difference between the two visible in one file, instead of
+# spread through a file that has to serve both.
+#
+# What this expects instead:
+#   - Postgres is a managed service (RDS, Cloud SQL, Azure Database).
+#   - Object storage is real S3 or equivalent.
+#   - TLS terminates at an ingress or load balancer in front of the frontend.
+#
+# Every value comes from the environment with no default. Compose fails to
+# start if one is missing, which is the intended behaviour: a production stack
+# that silently falls back to a development credential is the failure mode this
+# whole configuration exists to prevent.
+
+name: zerowaste-prod
+
+services:
+  # Not run here. Listed with `profiles` so `docker compose config` still
+  # resolves the base file's depends_on references, while `up` never starts
+  # them -- a production database inside the application's own compose project
+  # would share its lifecycle, and `docker compose down -v` would delete it.
+  postgres:
+    profiles: ["never"]
+  minio:
+    profiles: ["never"]
+  minio-init:
+    profiles: ["never"]
+
+  ai-service:
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on: !reset []
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          # pdfplumber holds page content in memory; a 200-PDF batch is the
+          # peak. Without a limit one large import can consume the host and
+          # take the backend down with it.
+          memory: 2g
+        reservations:
+          memory: 512m
+
+  migrate:
+    depends_on: !reset []
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?ADMIN_TOKEN is required}
+      FEEDBACK_HASH_SALT: ${FEEDBACK_HASH_SALT:?FEEDBACK_HASH_SALT is required}
+      ZEROWASTE_DATA_DIR: /var/lib/zerowaste
+      LOG_FORMAT: json
+
+  backend:
+    # !override, not a plain mapping: Compose *merges* depends_on across files,
+    # so without it the base file's postgres and minio-init dependencies would
+    # survive here -- and both are disabled by the "never" profile above, so
+    # the backend would wait forever for services that are never started.
+    depends_on: !override
+      ai-service:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_FORMAT: json
+      APP_VERSION: ${APP_VERSION:?APP_VERSION is required, use the commit SHA}
+
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?ADMIN_TOKEN is required}
+      FEEDBACK_HASH_SALT: ${FEEDBACK_HASH_SALT:?FEEDBACK_HASH_SALT is required}
+
+      # https origins only; the backend rejects plaintext and wildcards at boot.
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?CORS_ALLOWED_ORIGINS is required}
+
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      DATABASE_SSL: "true"
+
+      AI_SERVICE_URL: http://ai-service:8000
+
+      STORAGE_DRIVER: s3
+      STORAGE_BUCKET: ${STORAGE_BUCKET:?STORAGE_BUCKET is required}
+      STORAGE_REGION: ${STORAGE_REGION:?STORAGE_REGION is required}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+      # Left unset on purpose. The SDK's default credential chain finds the
+      # instance role or service-account identity, and a role that rotates
+      # itself is not a key that can be copied out of an environment listing.
+      STORAGE_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY_ID:-}
+      STORAGE_SECRET_ACCESS_KEY: ${STORAGE_SECRET_ACCESS_KEY:-}
+
+      ZEROWASTE_DATA_DIR: /var/lib/zerowaste
+
+      # The load balancer sets X-Forwarded-For and strips any inbound copy.
+      TRUST_PROXY: "true"
+      # Must exceed the balancer's deregistration delay, or in-flight requests
+      # are severed when the listener closes.
+      SHUTDOWN_GRACE_MS: ${SHUTDOWN_GRACE_MS:-15000}
+
+    # Published only to the loopback in the base file; in production the
+    # frontend proxies to it over the compose network and it needs no host port.
+    ports: !reset []
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+        reservations:
+          memory: 256m
+
+  frontend:
+    build:
+      args:
+        VITE_API_BASE: ""
+    environment:
+      BACKEND_HOST: backend
+      BACKEND_PORT: "5000"
+    ports:
+      # Bound to the loopback: TLS terminates at the ingress in front of this,
+      # so the container itself must not be directly reachable.
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+volumes:
+  postgres-data:
+  minio-data:

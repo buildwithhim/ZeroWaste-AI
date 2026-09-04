@@ -21,6 +21,7 @@ const importLog = require("./importLog");
 const { buildInvoiceAnalytics } = require("./invoiceAnalytics");
 const { describeDataset, refreshForecastDataset, datasetPath } = require("./forecastDataset");
 const { buildInvoicePipeline } = require("./invoicePipeline");
+const { logger } = require("../logger");
 
 const router = express.Router();
 
@@ -51,7 +52,7 @@ router.post("/import", upload.array("invoices", MAX_FILES_PER_BATCH), async (req
   try {
     res.status(201).json(await ingest(files, { actor: req.actor, source: "upload" }));
   } catch (error) {
-    console.error("Invoice import failed:", error.message);
+    logger.error("invoice import failed", { error });
     res.status(error.status || 500).json({ error: error.message || "Import failed" });
   }
 });
@@ -77,7 +78,7 @@ router.post("/scan", async (req, res) => {
 
     res.status(201).json(await ingest(files, { actor: req.actor, source: "drop-folder" }));
   } catch (error) {
-    console.error("Invoice scan failed:", error.message);
+    logger.error("invoice scan failed", { error });
     res.status(error.status || 500).json({ error: error.message || "Scan failed" });
   }
 });
@@ -111,7 +112,7 @@ router.get("/analytics", (req, res) => {
   try {
     res.json(buildInvoiceAnalytics(invoiceStore.listRecords()));
   } catch (error) {
-    console.error("Invoice analytics failed:", error.message);
+    logger.error("invoice analytics failed", { error });
     res.status(500).json({ error: "Analytics unavailable" });
   }
 });
@@ -150,7 +151,7 @@ router.post("/conflicts/:id/resolve", (req, res) => {
     try {
       dataset = refreshForecastDataset(invoiceStore.listRecords());
     } catch (error) {
-      console.warn("Dataset refresh after resolution failed:", error.message);
+      logger.warn("dataset refresh after conflict resolution failed", { error });
     }
   }
 
@@ -186,11 +187,11 @@ router.get("/dataset/download", (req, res) => {
 /**
  * Serves an original PDF from the vault.
  *
- * The hash is validated as 64 hex characters inside readRaw, so the path
- * cannot be steered outside the vault directory.
+ * The hash is validated as 64 hex characters inside the object store, so the
+ * key cannot be steered outside the vault whichever storage driver is active.
  */
-router.get("/raw/:hash", (req, res) => {
-  const buffer = invoiceStore.readRaw(req.params.hash);
+router.get("/raw/:hash", async (req, res) => {
+  const buffer = await invoiceStore.readRaw(req.params.hash);
   if (!buffer) return res.status(404).json({ error: "Original invoice not found in the vault" });
 
   importLog.audit({ event: "invoice.raw.viewed", actor: req.actor, contentHash: req.params.hash });

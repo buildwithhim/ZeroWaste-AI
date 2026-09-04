@@ -105,6 +105,14 @@ function seed(weeks = 6) {
 }
 
 if (require.main === module) {
+  // Guarded at the CLI entry rather than inside seed(), so importing this
+  // module -- to reuse its distributions, say -- cannot terminate the process.
+  // seed() calls replaceAll and then refreshSignals, which means it does not
+  // merely add demo responses: it discards the real ones and recomputes the
+  // portion multipliers the kitchen cooks to from the fabricated set.
+  const { assertSafeToSeed } = require(path.join(__dirname, "devOnly"));
+  assertSafeToSeed("scripts/seed_feedback.js");
+
   seed(Number(process.argv[2]) || 6);
 }
 

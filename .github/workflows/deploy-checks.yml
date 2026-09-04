@@ -1,0 +1,307 @@
+name: Deploy checks
+
+# Verifies that what we are about to ship is deployable, without deploying it.
+#
+# Separate from tests.yml on purpose. The test workflow answers "does the code
+# work"; this one answers "does the artefact build, does the schema apply, and
+# does the production safety guard actually refuse an unsafe configuration". A
+# change can pass every unit test and still produce an image that will not
+# start, or a migration that will not run.
+#
+# Nothing here pushes an image or touches an environment. The images are built
+# and discarded; the database is a service container.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  images:
+    name: Build production images
+    runs-on: ubuntu-latest
+    strategy:
+      # One job per image so the checks list names which one broke, and so a
+      # slow Python build does not delay feedback on the frontend.
+      fail-fast: false
+      matrix:
+        include:
+          - name: backend
+            dockerfile: docker/backend.Dockerfile
+          - name: frontend
+            dockerfile: docker/frontend.Dockerfile
+          - name: ai-service
+            dockerfile: docker/ai-service.Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          # Never pushed. This job proves the image builds; publishing is a
+          # release decision, made deliberately, not a side effect of a push to
+          # a branch.
+          push: false
+          load: true
+          tags: zerowaste-${{ matrix.name }}:ci
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+      - name: Verify the image does not run as root
+        # A container that builds is not a container that is safe to run. Both
+        # Dockerfiles create an unprivileged user; this catches the case where a
+        # later edit adds a step after USER, or drops the directive entirely.
+        run: |
+          user=$(docker image inspect zerowaste-${{ matrix.name }}:ci --format '{{.Config.User}}')
+          echo "Image user: '${user}'"
+          if [ -z "${user}" ] || [ "${user}" = "root" ] || [ "${user}" = "0" ]; then
+            echo "::error::zerowaste-${{ matrix.name }} runs as root"
+            exit 1
+          fi
+
+      - name: Verify no .env or runtime data was baked in
+        # The build context excludes these via .dockerignore. If that file is
+        # ever edited carelessly, a secret or the invoice vault ends up in a
+        # published layer, where no later fix can remove it.
+        run: |
+          if docker run --rm --entrypoint sh zerowaste-${{ matrix.name }}:ci \
+               -c 'ls -a / /app 2>/dev/null | grep -qE "^\.env"'; then
+            echo "::error::an .env file is present in the image"
+            exit 1
+          fi
+
+  compose:
+    name: Validate compose configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate the development stack
+        # `config` resolves interpolation, merges overlays and type-checks the
+        # schema. It catches an undefined variable or a malformed depends_on
+        # before somebody discovers it during an incident.
+        run: docker compose -f docker-compose.yml config --quiet
+        env:
+          ADMIN_TOKEN: ci-placeholder-not-a-real-secret-000000000
+          FEEDBACK_HASH_SALT: ci-placeholder-not-a-real-secret-000000000
+
+      - name: Validate the production overlay
+        run: docker compose -f docker-compose.yml -f docker-compose.prod.yml config --quiet
+        env:
+          # Placeholders only. These satisfy Compose's `:?` required-variable
+          # checks so the merge can be validated; they are not credentials and
+          # this job starts nothing.
+          ADMIN_TOKEN: ci-placeholder-not-a-real-secret-000000000
+          FEEDBACK_HASH_SALT: ci-placeholder-not-a-real-secret-000000000
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          CORS_ALLOWED_ORIGINS: https://example.invalid
+          STORAGE_BUCKET: ci-bucket
+          STORAGE_REGION: us-east-1
+          APP_VERSION: ${{ github.sha }}
+
+      - name: Assert production never publishes the AI service
+        # The AI service performs no authentication whatsoever. Exposing it
+        # would let anyone run arbitrary prediction and PDF-extraction workloads
+        # against the model, so its unreachability is a security control and is
+        # asserted rather than assumed.
+        run: |
+          published=$(docker compose -f docker-compose.yml -f docker-compose.prod.yml config --format json \
+            | jq -r '.services."ai-service".ports // [] | length')
+          if [ "${published}" != "0" ]; then
+            echo "::error::the ai-service publishes ${published} port(s) in the production overlay"
+            exit 1
+          fi
+        env:
+          ADMIN_TOKEN: ci-placeholder-not-a-real-secret-000000000
+          FEEDBACK_HASH_SALT: ci-placeholder-not-a-real-secret-000000000
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          CORS_ALLOWED_ORIGINS: https://example.invalid
+          STORAGE_BUCKET: ci-bucket
+          STORAGE_REGION: us-east-1
+          APP_VERSION: ${{ github.sha }}
+
+  migrations:
+    name: Migrations apply to a real database
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17.2-alpine
+        env:
+          POSTGRES_USER: zerowaste
+          POSTGRES_PASSWORD: ci-local-only
+          POSTGRES_DB: zerowaste_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U zerowaste -d zerowaste_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://zerowaste:ci-local-only@localhost:5432/zerowaste_ci
+      ZEROWASTE_DATA_DIR: ${{ github.workspace }}/data
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Apply migrations
+        # The SQL is only really verified by running it. A dollar-quoted plpgsql
+        # trigger body inside a multi-statement query, an enum that already
+        # exists, a constraint that contradicts a default -- none of these are
+        # visible by reading the file.
+        working-directory: backend
+        run: npm run migrate
+
+      - name: Re-apply, asserting idempotence
+        # Migrations run on every deploy. A second run must be a no-op, or a
+        # rolling restart becomes an outage.
+        working-directory: backend
+        run: |
+          npm run migrate
+          npm run migrate:check
+
+      - name: Assert the ledger recorded every migration
+        run: |
+          count=$(psql "${DATABASE_URL}" -tAc 'SELECT count(*) FROM schema_migrations')
+          files=$(ls backend/migrations/*.sql | wc -l)
+          echo "applied=${count} files=${files}"
+          if [ "${count}" != "${files}" ]; then
+            echo "::error::${files} migration file(s) on disk but ${count} recorded"
+            exit 1
+          fi
+
+      - name: Assert the audit log is append-only
+        # invoice_audit_log carries a trigger that rejects UPDATE and DELETE.
+        # An audit trail that can be edited is not an audit trail, so the
+        # protection is tested rather than trusted.
+        #
+        # The row is inserted first on purpose: the trigger is FOR EACH ROW, so
+        # a DELETE against an empty table succeeds without ever firing it and
+        # the check would pass while proving nothing.
+        run: |
+          psql "${DATABASE_URL}" -c "INSERT INTO invoice_audit_log (event, actor, payload) VALUES ('ci.check', 'ci', '{}'::jsonb)"
+          if psql "${DATABASE_URL}" -c "UPDATE invoice_audit_log SET actor = 'tampered'" 2>/dev/null; then
+            echo "::error::invoice_audit_log accepted an UPDATE"
+            exit 1
+          fi
+          if psql "${DATABASE_URL}" -c "DELETE FROM invoice_audit_log" 2>/dev/null; then
+            echo "::error::invoice_audit_log accepted a DELETE"
+            exit 1
+          fi
+          echo "append-only enforced"
+
+  config-guard:
+    name: Production config guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Unit-test the guard
+        working-directory: backend
+        run: npx vitest run tests/unit/config.test.js
+
+      - name: Assert the server refuses to boot with the committed defaults
+        # The unit test covers validateConfig. This covers the wiring: that
+        # server.js actually calls loadConfig, actually catches
+        # ConfigurationError, and actually exits rather than logging and
+        # carrying on. That is the property that protects production.
+        working-directory: backend
+        run: |
+          set +e
+          NODE_ENV=production node server.js > boot.log 2>&1
+          code=$?
+          set -e
+
+          echo "exit code: ${code}"
+          cat boot.log
+
+          if [ "${code}" != "78" ]; then
+            echo "::error::expected exit 78 (EX_CONFIG) with an unsafe production config, got ${code}"
+            exit 1
+          fi
+
+          grep -q "ADMIN_TOKEN" boot.log || { echo "::error::the failure did not name ADMIN_TOKEN"; exit 1; }
+          grep -q "CORS_ALLOWED_ORIGINS" boot.log || { echo "::error::the failure did not name CORS_ALLOWED_ORIGINS"; exit 1; }
+
+      - name: Assert no secret is printed by the failure
+        # The boot failure is written to stdout, which goes to a log
+        # aggregator. It must name which variable is wrong without echoing what
+        # it was set to.
+        working-directory: backend
+        run: |
+          set +e
+          NODE_ENV=production ADMIN_TOKEN=super-secret-value-that-must-not-be-logged-000 \
+            node server.js > boot.log 2>&1
+          set -e
+
+          if grep -q "super-secret-value-that-must-not-be-logged" boot.log; then
+            echo "::error::the boot failure echoed a secret value"
+            cat boot.log
+            exit 1
+          fi
+          echo "no secret leaked"
+
+  secrets:
+    name: No committed secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # gitleaks scans history, not just the tip. A secret removed in a
+          # later commit is still a leaked secret.
+          fetch-depth: 0
+
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Assert .env.example contains no filled-in values
+        # It is the one committed file whose whole purpose is to look like a
+        # real configuration, which makes it the most likely place for somebody
+        # to paste a working credential while testing.
+        run: |
+          if grep -nE '^(ADMIN_TOKEN|FEEDBACK_HASH_SALT|POSTGRES_PASSWORD|MINIO_ROOT_PASSWORD|STORAGE_SECRET_ACCESS_KEY|STORAGE_ACCESS_KEY_ID)=.+' .env.example; then
+            echo "::error::.env.example has a filled-in secret; it must ship placeholders only"
+            exit 1
+          fi
+          echo ".env.example is clean"
+
+      - name: Assert .env is not tracked
+        run: |
+          if git ls-files --error-unmatch .env 2>/dev/null; then
+            echo "::error::.env is tracked by git"
+            exit 1
+          fi
+          echo ".env is not tracked"

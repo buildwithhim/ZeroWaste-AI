@@ -1,47 +1,24 @@
 /**
- * Thin wrapper around backend/predict.py.
+ * Thin wrapper around the prediction model.
  *
  * The planner needs one forecast per menu family on the board, so it always
- * uses the batch path: a single Python process loads the model and encoders
- * once and answers every family, instead of paying that cost per dish.
+ * uses the batch path: the model and encoders are loaded once and answer every
+ * family, instead of paying that cost per dish.
+ *
+ * Transport -- a spawned `predict.py` in development, the containerised AI
+ * service in production -- is decided in lib/aiService.js. Nothing here changes
+ * between the two.
  */
 
-const { spawn } = require("child_process");
-const path = require("path");
-
-const BACKEND_DIR = path.join(__dirname, "..", "..");
-const PYTHON_PATH = () => process.env.PYTHON_PATH || path.join(BACKEND_DIR, "..", ".venv", "Scripts", "python.exe");
+const aiService = require("../aiService");
 
 /** Resolves with a Map keyed by menu family. Rejects if the predictor fails. */
-function predictFamilies(weekday, families) {
+async function predictFamilies(weekday, families) {
   const unique = [...new Set(families)];
-  if (!unique.length) return Promise.resolve(new Map());
+  if (!unique.length) return new Map();
 
-  return new Promise((resolve, reject) => {
-    const python = spawn(PYTHON_PATH(), ["predict.py", "--batch"], { cwd: BACKEND_DIR });
-    let output = "";
-    let error = "";
-
-    python.stdout.on("data", (chunk) => (output += chunk.toString()));
-    python.stderr.on("data", (chunk) => (error += chunk.toString()));
-    python.on("error", reject);
-    python.on("close", (code) => {
-      if (code !== 0) return reject(new Error(error.trim() || `predict.py exited with code ${code}`));
-
-      let parsed;
-      try {
-        parsed = JSON.parse(output);
-      } catch {
-        return reject(new Error(`Unreadable predictor output: ${output.slice(0, 400)}`));
-      }
-
-      if (parsed.error) return reject(new Error(parsed.error));
-      resolve(new Map((parsed.predictions || []).map((row) => [row.menu, row])));
-    });
-
-    python.stdin.write(JSON.stringify(unique.map((menu) => ({ weekday, menu }))));
-    python.stdin.end();
-  });
+  const parsed = await aiService.predictBatch(unique.map((menu) => ({ weekday, menu })));
+  return new Map((parsed.predictions || []).map((row) => [row.menu, row]));
 }
 
 module.exports = { predictFamilies };

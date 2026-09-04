@@ -11,10 +11,18 @@
  * recomputing it afterwards) would manufacture a perfect accuracy score, which
  * is exactly the sort of flattering nonsense this dashboard is meant to avoid.
  *
+ * Development only. It calls replaceAll on three stores, so running it against
+ * real data destroys the record of what was actually booked, forecast and
+ * served. assertSafeToSeed below refuses to let that happen by accident.
+ *
  * Usage:  node scripts/seed_operations.js [serviceDays]
  */
 
 const path = require("path");
+
+const { assertSafeToSeed } = require(path.join(__dirname, "devOnly"));
+
+assertSafeToSeed("scripts/seed_operations.js");
 
 const bookingStore = require(path.join(__dirname, "..", "backend", "lib", "operations", "bookingStore"));
 const serviceLog = require(path.join(__dirname, "..", "backend", "lib", "operations", "serviceLog"));

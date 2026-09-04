@@ -1,0 +1,124 @@
+# nginx configuration template for the ZeroWaste AI frontend.
+#
+# Serves the compiled Vite bundle and proxies the API. Putting both on one
+# origin is a deliberate choice: the browser then makes same-origin requests, so
+# there is no CORS preflight on any call, and the allowlist in the backend
+# matters only for callers that genuinely are cross-origin.
+#
+# This is a template, not a finished config. The nginx entrypoint runs envsubst
+# over everything in /etc/nginx/templates at container start, so the backend
+# address is a deployment-time value rather than something baked into the image
+# -- the same image runs against a Compose service name, a Kubernetes service
+# and an external host.
+#
+# NGINX_ENVSUBST_FILTER is set to ^BACKEND_ in the Dockerfile. Without it,
+# envsubst would also expand nginx's own runtime variables -- $host, $uri,
+# $remote_addr -- if anything in the environment happened to share their name,
+# and the failure would be a config that silently proxies to the wrong place.
+
+upstream backend_api {
+    server ${BACKEND_HOST}:${BACKEND_PORT};
+    keepalive 32;
+}
+
+server {
+    listen 8080;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # nginx advertises its exact version in every response and error page by
+    # default, which tells a scanner which CVE list to try first.
+    server_tokens off;
+
+    # --- Security headers ---------------------------------------------------
+    #
+    # These are cheap and they are the browser-side half of several audit
+    # findings. They do not fix the server-side ones -- see docs/DEPLOYMENT.md.
+
+    # The app is not designed to be framed; refusing makes clickjacking against
+    # the admin dashboard impossible rather than merely awkward.
+    add_header X-Frame-Options "DENY" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # Nothing here uses a camera, microphone or location; saying so means a
+    # compromised dependency cannot quietly ask for one.
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+
+    # 'unsafe-inline' for styles is required by the styled components in use;
+    # scripts are not granted it. Removing the style exception needs a nonce
+    # pipeline in the build, which is a change to make deliberately rather than
+    # as part of a deployment.
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+
+    # Only meaningful over HTTPS, and it is the TLS terminator's job to set it
+    # if it terminates. Left commented so enabling it is a decision, not an
+    # accident -- HSTS with a long max-age is hard to undo.
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+
+    client_max_body_size 12m;  # Slightly above the 10 MB invoice limit.
+
+    # --- Health -------------------------------------------------------------
+    # Served by nginx itself, so it answers whether or not the backend is up.
+    # A frontend that cannot reach the API is still correctly serving the app.
+    location = /healthz {
+        access_log off;
+        add_header Content-Type application/json;
+        return 200 '{"status":"ok"}';
+    }
+
+    # --- API ----------------------------------------------------------------
+    #
+    # Every backend prefix is listed explicitly. A catch-all proxy would forward
+    # anything that is not a file on disk, which turns a typo in a route into a
+    # request the backend has to answer, and makes the boundary between the two
+    # services impossible to read off this file.
+    location ~ ^/(admin|operations|feedback|forecast|pipeline|health)(/|$) {
+        proxy_pass http://backend_api;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection        "";
+
+        # Invoice extraction runs pdfplumber over a batch of up to 200 PDFs, so
+        # the default 60s read timeout is not enough for a large import.
+        proxy_connect_timeout 5s;
+        proxy_send_timeout    120s;
+        proxy_read_timeout    120s;
+
+        # Invoice originals stream back through here; buffering a batch of
+        # 10 MB PDFs to disk first adds latency for no benefit.
+        proxy_buffering off;
+    }
+
+    # --- Static assets ------------------------------------------------------
+    #
+    # Vite fingerprints filenames with a content hash, so a given URL's content
+    # never changes and it can be cached indefinitely.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # index.html is the opposite: it is the document that names the current
+    # fingerprinted bundles, so caching it pins users to a stale release.
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        expires 0;
+    }
+
+    # Client-side routing: an unknown path is a React route, not a 404.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

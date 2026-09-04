@@ -11,7 +11,13 @@ dist/
 build/
 
 # Environment
+# Everything .env* is ignored, then .env.example is re-included: it is the
+# committed template and must never contain real values. Ignoring only ".env"
+# would let .env.production or .env.local be committed by accident, which is
+# exactly the file most likely to hold a working credential.
 .env
+.env.*
+!.env.example
 
 # Runtime feedback data (regenerate with: npm run seed:feedback)
 data/feedback.json

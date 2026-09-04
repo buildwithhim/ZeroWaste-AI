@@ -9,16 +9,20 @@
     "test:unit": "vitest run tests/unit",
     "test:api": "vitest run tests/api",
     "test:coverage": "vitest run --coverage",
-    "start": "node server.js"
+    "start": "node server.js",
+    "migrate": "node scripts/migrate.js",
+    "migrate:check": "node scripts/migrate.js --check"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.699.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.11",

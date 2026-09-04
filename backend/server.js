@@ -1,7 +1,4 @@
 const express = require("express");
-const cors = require("cors");
-const { spawn } = require("child_process");
-const path = require("path");
 
 const { isValidResponse, RESPONSES } = require("./lib/feedbackModel");
 const feedbackStore = require("./lib/feedbackStore");
@@ -13,9 +10,42 @@ const { adminGate } = require("./lib/requireAdmin");
 const invoiceRoutes = require("./lib/invoices/routes");
 const { adminRouter: operationsAdminRoutes, publicRouter: operationsPublicRoutes } = require("./lib/operations/routes");
 
+const { readConfig, loadConfig, describeConfig, ConfigurationError } = require("./lib/config");
+const { corsMiddleware } = require("./lib/cors");
+const { requestLogging } = require("./lib/requestLogging");
+const { healthRoutes } = require("./lib/health");
+const { installGracefulShutdown } = require("./lib/shutdown");
+const aiService = require("./lib/aiService");
+const { logger } = require("./lib/logger");
+
+const config = readConfig();
+
 const app = express();
-app.use(cors());
-app.use(express.json());
+
+// Behind an ingress or load balancer the client address is in X-Forwarded-For.
+// Trusting it when nothing sets it lets a client claim any address it likes,
+// so this is opt-in through TRUST_PROXY.
+if (config.server.trustProxy) app.set("trust proxy", true);
+
+// Express advertises itself in every response by default. Naming the framework
+// tells a scanner which vulnerability list to try first, and tells a legitimate
+// user nothing.
+app.disable("x-powered-by");
+
+app.use(requestLogging());
+app.use(corsMiddleware(config));
+// Bounded so a large body cannot be used to exhaust memory. Invoice uploads go
+// through multer with its own limits and are unaffected.
+app.use(express.json({ limit: config.server.bodyLimit }));
+
+/**
+ * Liveness, readiness and build information.
+ *
+ * Mounted first, and ahead of every guard, because a probe cannot present a
+ * credential and a health check that depends on the rest of the application
+ * being healthy is not a health check.
+ */
+app.use(healthRoutes());
 
 /**
  * SmartQ invoice ingestion. Mounted as a unit so the admin guard inside the
@@ -38,29 +68,8 @@ app.use("/admin/invoices", invoiceRoutes);
 app.use("/admin/operations", operationsAdminRoutes);
 app.use("/operations", operationsPublicRoutes);
 
-const PORT = process.env.PORT || 5000;
-const pythonPath = process.env.PYTHON_PATH || path.join(__dirname, "..", ".venv", "Scripts", "python.exe");
-
 /** Runs the predictor and resolves with its JSON payload. */
-function runPredictor(weekday, menu) {
-  return new Promise((resolve, reject) => {
-    const py = spawn(pythonPath, ["predict.py", weekday, menu], { cwd: __dirname });
-    let output = "";
-    let error = "";
-
-    py.stdout.on("data", (chunk) => (output += chunk.toString()));
-    py.stderr.on("data", (chunk) => (error += chunk.toString()));
-    py.on("error", reject);
-    py.on("close", (code) => {
-      if (code !== 0) return reject(new Error(error || `predict.py exited with code ${code}`));
-      try {
-        resolve(JSON.parse(output));
-      } catch {
-        reject(new Error(`Unreadable predictor output: ${output}`));
-      }
-    });
-  });
-}
+const runPredictor = (weekday, menu) => aiService.predictOne(weekday, menu);
 
 /**
  * Stages 2, 3 and 8: prediction, cooking quantity, and the feedback adjustment
@@ -89,7 +98,7 @@ app.get("/forecast", async (req, res) => {
       weekday,
     });
   } catch (error) {
-    console.error("Forecast failed:", error.message);
+    logger.error("forecast failed", { error });
     res.status(500).json({ error: "Forecast unavailable" });
   }
 });
@@ -119,7 +128,7 @@ app.post("/feedback", (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Failed to record feedback:", error.message);
+    logger.error("failed to record feedback", { error });
     res.status(500).json({ error: "Could not record feedback" });
   }
 });
@@ -146,7 +155,7 @@ app.get("/admin/analytics/feedback", adminGate("Administrator access is required
   try {
     res.json(buildAdminReport(feedbackStore.listAll()));
   } catch (error) {
-    console.error("Analytics failed:", error.message);
+    logger.error("analytics failed", { error });
     res.status(500).json({ error: "Analytics unavailable" });
   }
 });
@@ -174,16 +183,55 @@ app.get("/pipeline", async (req, res) => {
     predictedOrders = result.prediction;
     recommendedServings = result.recommendedServings ?? result.prediction;
   } catch (error) {
-    console.warn("Pipeline forecast metrics unavailable:", error.message);
+    logger.warn("pipeline forecast metrics unavailable", { error });
   }
 
   res.json(buildPipeline({ bookings, predictedOrders, recommendedServings }));
 });
 
-app.get("/health", (req, res) => res.json({ status: "ok" }));
+/**
+ * Boot.
+ *
+ * Configuration is validated before the port is opened. In production an
+ * invalid configuration is fatal: exiting with the list of problems makes a
+ * misconfigured rollout fail visibly, where booting anyway with a committed
+ * default admin token would fail silently and much later.
+ */
+function start() {
+  let validated;
+  try {
+    validated = loadConfig();
+  } catch (error) {
+    if (error instanceof ConfigurationError) {
+      logger.error("refusing to start with an invalid configuration", { problems: error.problems });
+      return process.exit(78); // EX_CONFIG
+    }
+    throw error;
+  }
+
+  const server = app.listen(validated.server.port, validated.server.host, () => {
+    logger.info("backend listening", describeConfig(validated));
+  });
+
+  // Slowloris: a client that opens a connection and sends headers a byte at a
+  // time holds a socket open indefinitely. Node's defaults are generous.
+  server.headersTimeout = 20000;
+  server.requestTimeout = 60000;
+  // Must exceed the load balancer's idle timeout, or the balancer will reuse a
+  // connection this process is closing and the client sees a 502.
+  server.keepAliveTimeout = 65000;
+
+  installGracefulShutdown(server, {
+    graceMs: validated.server.shutdownGraceMs,
+    isProduction: validated.isProduction,
+  });
+
+  return server;
+}
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`Backend running at http://localhost:${PORT}`));
+  start();
 }
 
 module.exports = app;
+module.exports.start = start;

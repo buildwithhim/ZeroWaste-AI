@@ -21,6 +21,7 @@ const { listMenu } = require("./menu");
 const { buildPortionAdvice } = require("./portionAdvice");
 const { buildPersonalImpact } = require("./personalImpact");
 const { todayKey } = require("./serviceDate");
+const { logger } = require("../logger");
 
 const adminRouter = express.Router();
 const publicRouter = express.Router();
@@ -41,7 +42,7 @@ adminRouter.get("/today", async (req, res) => {
     const plan = await buildTodayPlan({ date: requested, freeze: requested === todayKey() });
     res.json(plan);
   } catch (error) {
-    console.error("Operational plan failed:", error.message);
+    logger.error("operational plan failed", { error });
     res.status(500).json({ error: "Could not build today's plan" });
   }
 });
@@ -51,7 +52,7 @@ adminRouter.get("/accuracy", (req, res) => {
     const limit = Math.min(60, Math.max(1, Number(req.query.limit) || 14));
     res.json(buildAccuracyReport({ limit }));
   } catch (error) {
-    console.error("Accuracy report failed:", error.message);
+    logger.error("accuracy report failed", { error });
     res.status(500).json({ error: "Accuracy report unavailable" });
   }
 });
@@ -60,7 +61,7 @@ adminRouter.get("/esg", (req, res) => {
   try {
     res.json(buildEsgReport());
   } catch (error) {
-    console.error("ESG report failed:", error.message);
+    logger.error("esg report failed", { error });
     res.status(500).json({ error: "ESG report unavailable" });
   }
 });

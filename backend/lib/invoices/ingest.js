@@ -14,7 +14,6 @@ const crypto = require("crypto");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const { spawn } = require("child_process");
 
 const { MAX_FILES_PER_BATCH, OUTCOMES } = require("./invoiceModel");
 const { validateFile, contentHash, safeFileName } = require("./validation");
@@ -22,39 +21,18 @@ const { normalise } = require("./normalization");
 const invoiceStore = require("./invoiceStore");
 const importLog = require("./importLog");
 const { refreshForecastDataset } = require("./forecastDataset");
-
-const pythonPath = () => process.env.PYTHON_PATH || path.join(__dirname, "..", "..", "..", ".venv", "Scripts", "python.exe");
+const aiService = require("../aiService");
+const { logger } = require("../logger");
 
 /**
- * Runs the Python extractor over a set of temp files.
+ * Runs the extractor over a set of temp files.
  *
  * Files are written to a temp directory first because pdfplumber needs a real
- * path, and uploads arrive as buffers held in memory.
+ * path, and uploads arrive as buffers held in memory. When the extractor runs
+ * as a separate service the bytes are sent instead of the paths -- that
+ * difference lives entirely in lib/aiService.js.
  */
-function runExtractor(files) {
-  return new Promise((resolve, reject) => {
-    const py = spawn(pythonPath(), [path.join(__dirname, "..", "..", "parse_invoices.py")], { cwd: path.join(__dirname, "..", "..") });
-    let output = "";
-    let error = "";
-
-    py.stdout.on("data", (chunk) => (output += chunk.toString()));
-    py.stderr.on("data", (chunk) => (error += chunk.toString()));
-    py.on("error", reject);
-    py.on("close", (code) => {
-      if (code !== 0) return reject(new Error(error.trim() || `parse_invoices.py exited with code ${code}`));
-      try {
-        const parsed = JSON.parse(output);
-        if (parsed.error) return reject(new Error(parsed.error));
-        resolve(parsed.results || []);
-      } catch {
-        reject(new Error(`Unreadable extractor output: ${output.slice(0, 300)}`));
-      }
-    });
-
-    py.stdin.write(JSON.stringify({ files }));
-    py.stdin.end();
-  });
-}
+const runExtractor = (files) => aiService.extractInvoices(files);
 
 /**
  * Ingests a batch.
@@ -92,11 +70,13 @@ async function ingest(incoming, context = {}) {
       pending.push({ id: hash, path: tempPath, fileName, buffer: file.buffer, contentHash: hash, warning: check.warning });
     }
 
-    // Stage 2: extraction, in a single Python process for the whole batch.
+    // Stage 2: extraction, in one call for the whole batch.
     let extracted = [];
     if (pending.length > 0) {
       try {
-        extracted = await runExtractor(pending.map(({ id, path: filePath }) => ({ id, path: filePath })));
+        extracted = await runExtractor(
+          pending.map(({ id, path: filePath, buffer }) => ({ id, path: filePath, buffer }))
+        );
       } catch (error) {
         for (const file of pending) {
           results.push({
@@ -149,7 +129,7 @@ async function ingest(incoming, context = {}) {
       // The original is vaulted for anything we accepted or must adjudicate, so
       // an administrator can always compare against the source document.
       if (outcome.outcome !== OUTCOMES.DUPLICATE) {
-        invoiceStore.storeRaw(file.buffer, file.contentHash);
+        await invoiceStore.storeRaw(file.buffer, file.contentHash);
       }
 
       results.push({
@@ -188,7 +168,7 @@ async function ingest(incoming, context = {}) {
     try {
       dataset = refreshForecastDataset(invoiceStore.listRecords());
     } catch (error) {
-      console.warn("Forecast dataset refresh failed:", error.message);
+      logger.warn("forecast dataset refresh failed", { error });
     }
   }
 
