@@ -13,12 +13,13 @@ const multer = require("multer");
 const path = require("path");
 
 const { MAX_FILE_BYTES, MAX_FILES_PER_BATCH, ERROR_CODES, OUTCOMES, STAGES } = require("./invoiceModel");
+const { dataPath } = require("../dataDir");
 const { requireAdmin } = require("./requireAdmin");
 const { ingest } = require("./ingest");
 const invoiceStore = require("./invoiceStore");
 const importLog = require("./importLog");
 const { buildInvoiceAnalytics } = require("./invoiceAnalytics");
-const { describeDataset, refreshForecastDataset, DATASET_PATH } = require("./forecastDataset");
+const { describeDataset, refreshForecastDataset, datasetPath } = require("./forecastDataset");
 const { buildInvoicePipeline } = require("./invoicePipeline");
 
 const router = express.Router();
@@ -62,7 +63,7 @@ router.post("/import", upload.array("invoices", MAX_FILES_PER_BATCH), async (req
  * it, so this is not a way to read arbitrary files off the host.
  */
 router.post("/scan", async (req, res) => {
-  const folder = path.join(__dirname, "..", "..", "..", "data", "invoices");
+  const folder = dataPath("invoices");
 
   try {
     if (!fs.existsSync(folder)) return res.status(404).json({ error: "No invoice drop folder on the server" });
@@ -168,16 +169,17 @@ router.get("/dataset", (req, res) => {
  * readable file whenever the app is deployed under one (".copilot", ".local").
  */
 router.get("/dataset/download", (req, res) => {
+  const target = datasetPath();
   let csv;
   try {
-    csv = fs.readFileSync(DATASET_PATH);
+    csv = fs.readFileSync(target);
   } catch {
     return res.status(404).json({ error: "No dataset has been generated yet" });
   }
 
   res
     .type("text/csv")
-    .set("Content-Disposition", `attachment; filename="${path.basename(DATASET_PATH)}"`)
+    .set("Content-Disposition", `attachment; filename="${path.basename(target)}"`)
     .send(csv);
 });
 

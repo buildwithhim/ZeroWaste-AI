@@ -16,8 +16,9 @@ const path = require("path");
 
 const { invoiceMenuFamily } = require("./menuMapping");
 
-const DATA_DIR = path.join(__dirname, "..", "..", "..", "data");
-const DATASET_PATH = path.join(DATA_DIR, "invoice_orders_dataset.csv");
+const { dataDir, dataPath } = require("../dataDir");
+
+const datasetPath = () => dataPath("invoice_orders_dataset.csv");
 
 /**
  * Aggregates records into daily per-family order counts.
@@ -74,12 +75,13 @@ function toCsv(rows) {
 /** Writes the dataset atomically so a reader never sees a half-written file. */
 function refreshForecastDataset(records) {
   const rows = buildDataset(records);
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const tempPath = `${DATASET_PATH}.tmp`;
+  fs.mkdirSync(dataDir(), { recursive: true });
+  const target = datasetPath();
+  const tempPath = `${target}.tmp`;
   fs.writeFileSync(tempPath, toCsv(rows));
-  fs.renameSync(tempPath, DATASET_PATH);
+  fs.renameSync(tempPath, target);
 
-  return { rows: rows.length, fileName: path.basename(DATASET_PATH), path: DATASET_PATH, generatedAt: new Date().toISOString() };
+  return { rows: rows.length, fileName: path.basename(target), path: target, generatedAt: new Date().toISOString() };
 }
 
 /** Summary for the admin screen, without writing anything. */
@@ -93,7 +95,7 @@ function describeDataset(records) {
   let generatedAt = null;
   let fileWritten = false;
   try {
-    generatedAt = fs.statSync(DATASET_PATH).mtime.toISOString();
+    generatedAt = fs.statSync(datasetPath()).mtime.toISOString();
     fileWritten = true;
   } catch {
     generatedAt = null;
@@ -102,7 +104,7 @@ function describeDataset(records) {
 
   return {
     rows: rows.length,
-    fileName: path.basename(DATASET_PATH),
+    fileName: path.basename(datasetPath()),
     generatedAt,
     fileWritten,
     totalOrders: rows.reduce((sum, row) => sum + row.orders, 0),
@@ -112,4 +114,4 @@ function describeDataset(records) {
   };
 }
 
-module.exports = { buildDataset, refreshForecastDataset, describeDataset, toCsv, DATASET_PATH };
+module.exports = { buildDataset, refreshForecastDataset, describeDataset, toCsv, datasetPath };

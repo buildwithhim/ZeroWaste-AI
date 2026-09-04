@@ -14,7 +14,9 @@ const { aggregate, summarise, portionMultiplier } = require("./analytics");
 const { menuFamilyFor, MENU_FAMILIES } = require("./menuTaxonomy");
 const { MIN_DISH_SAMPLE } = require("./feedbackModel");
 
-const SIGNALS_PATH = path.join(__dirname, "..", "..", "data", "feedback_signals.json");
+const { dataPath } = require("./dataDir");
+
+const signalsPath = () => dataPath("feedback_signals.json");
 
 /**
  * Builds the signal document. Contains only aggregate statistics — it is
@@ -89,16 +91,17 @@ function buildSignals(entries, options = {}) {
 /** Recomputes and persists the signals. Called after every new response. */
 function refreshSignals(entries, options = {}) {
   const signals = buildSignals(entries, options);
-  const tempPath = `${SIGNALS_PATH}.tmp`;
-  fs.mkdirSync(path.dirname(SIGNALS_PATH), { recursive: true });
+  const target = signalsPath();
+  const tempPath = `${target}.tmp`;
+  fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(tempPath, JSON.stringify(signals, null, 2));
-  fs.renameSync(tempPath, SIGNALS_PATH);
+  fs.renameSync(tempPath, target);
   return signals;
 }
 
 function readSignals() {
   try {
-    return JSON.parse(fs.readFileSync(SIGNALS_PATH, "utf8"));
+    return JSON.parse(fs.readFileSync(signalsPath(), "utf8"));
   } catch {
     return null;
   }
@@ -142,4 +145,4 @@ function toPublicSignals(signals) {
   };
 }
 
-module.exports = { buildSignals, refreshSignals, readSignals, toPublicSignals, SIGNALS_PATH };
+module.exports = { buildSignals, refreshSignals, readSignals, toPublicSignals, signalsPath };
