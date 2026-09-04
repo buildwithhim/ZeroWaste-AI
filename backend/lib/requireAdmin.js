@@ -11,9 +11,24 @@
  *
  * Replace `tokenMatches` with the real identity check when SSO lands -- the
  * route layers should not need to change.
+ *
+ * THE TOKEN IS NOT A SECRET IN DEVELOPMENT
+ * ----------------------------------------
+ * The default below is committed to this repository and is also compiled into
+ * the frontend bundle, so in a development build "holding the admin token" means
+ * nothing at all. That is finding C2 of the security audit and is not fixed
+ * here. What is enforced is that it cannot reach production: lib/config.js
+ * refuses to boot with NODE_ENV=production while ADMIN_TOKEN is still this
+ * value. See docs/DEPLOYMENT.md, which lists C1 and C2 as go-live blockers.
  */
 
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "zerowaste-local-admin-token";
+const { readConfig } = require("./config");
+
+/**
+ * Resolved per call rather than at import, so a test that sets ADMIN_TOKEN
+ * after this module is first required is not silently ignored.
+ */
+const adminToken = () => readConfig().security.adminToken;
 
 /** Reads the token from the header, falling back to a bearer authorization. */
 function presentedToken(req) {
@@ -27,7 +42,7 @@ function presentedToken(req) {
 
 /** Constant-time comparison so the token cannot be recovered by timing. */
 function tokenMatches(presented) {
-  const expected = ADMIN_TOKEN;
+  const expected = adminToken();
   if (presented.length !== expected.length) return false;
   let mismatch = 0;
   for (let i = 0; i < presented.length; i += 1) {
@@ -47,4 +62,13 @@ function adminGate(message = "Administrator access is required") {
   };
 }
 
-module.exports = { adminGate, ADMIN_TOKEN, presentedToken, tokenMatches };
+module.exports = {
+  adminGate,
+  presentedToken,
+  tokenMatches,
+  adminToken,
+  /** Kept as a getter so existing importers see the live value, not a snapshot. */
+  get ADMIN_TOKEN() {
+    return adminToken();
+  },
+};

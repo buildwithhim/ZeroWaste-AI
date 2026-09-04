@@ -1,0 +1,203 @@
+# ZeroWaste AI -- local stack.
+#
+# This file is for development and for verifying the production images build and
+# talk to each other. It is not a production deployment: it runs Postgres and
+# MinIO as containers with well-known credentials, exposes every port on
+# localhost, and mounts source into the backend for reload. See
+# docker-compose.prod.yml and docs/DEPLOYMENT.md for the production shape.
+#
+# Bring it up with:
+#   cp .env.example .env && docker compose up --build
+
+name: zerowaste
+
+services:
+  postgres:
+    image: postgres:17.2-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zerowaste}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zerowaste-local-only}
+      POSTGRES_DB: ${POSTGRES_DB:-zerowaste}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      # -U and -d matter: bare pg_isready reports the server is accepting
+      # connections while it is still replaying WAL, and dependents start
+      # against a database that then refuses their queries.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zerowaste} -d ${POSTGRES_DB:-zerowaste}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # Stands in for S3. The backend's s3 driver talks to it over the same API, so
+  # the code path exercised locally is the one that runs in production -- unlike
+  # the local filesystem driver, which exercises nothing.
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-zerowaste}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-zerowaste-local-only}
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # One-shot: creates the bucket, then exits. Modelled as a service with a
+  # completion condition rather than a shell step so `docker compose up` is the
+  # whole setup procedure.
+  minio-init:
+    image: minio/mc:RELEASE.2024-11-21T17-21-54Z
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-zerowaste}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-zerowaste-local-only}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-zerowaste-invoices}
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD &&
+      mc mb --ignore-existing local/$$STORAGE_BUCKET &&
+      mc version enable local/$$STORAGE_BUCKET &&
+      echo 'bucket ready'
+      "
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: docker/ai-service.Dockerfile
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PORT: 8000
+      ZEROWASTE_DATA_DIR: /var/lib/zerowaste
+    volumes:
+      # The same directory the backend uses, mounted read-only.
+      #
+      # This is not a convenience. predict.py loads model.pkl and both encoders
+      # from here at import, and re-reads feedback_signals.json on every
+      # request -- and that file is *written by the backend* whenever feedback
+      # is submitted. Give the two services separate directories and the
+      # forecast silently stops responding to feedback: the service keeps
+      # serving predictions from whatever signals happened to exist when its
+      # directory was created, with no error anywhere.
+      #
+      # Read-only because the AI service has no business writing here, and a
+      # bind mount rather than a named volume so the artefacts a fresh clone
+      # already contains are visible without a seeding step.
+      #
+      # This coupling disappears with the Postgres cutover, when signals become
+      # a table both services read. See docs/DEPLOYMENT.md.
+      - ./data:/var/lib/zerowaste:ro
+    # Not published to the host. Nothing outside the compose network has any
+    # business calling the prediction service directly -- it performs no
+    # authentication, by design, because it is meant to be unreachable.
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health/live').read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Applies migrations, then exits. Separated from the backend so the schema is
+  # at a known version before any application container accepts a request, and
+  # so the backend's own database role never needs DDL privileges.
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    command: ["node", "scripts/migrate.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://${POSTGRES_USER:-zerowaste}:${POSTGRES_PASSWORD:-zerowaste-local-only}@postgres:5432/${POSTGRES_DB:-zerowaste}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN in .env}
+      FEEDBACK_HASH_SALT: ${FEEDBACK_HASH_SALT:?set FEEDBACK_HASH_SALT in .env}
+      ZEROWASTE_DATA_DIR: /var/lib/zerowaste
+    restart: "no"
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
+      ai-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 5000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+
+      # Interpolated with :? so Compose refuses to start rather than falling
+      # back to the committed development defaults, which the backend would
+      # then reject at boot anyway -- failing here gives a clearer message.
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN in .env}
+      FEEDBACK_HASH_SALT: ${FEEDBACK_HASH_SALT:?set FEEDBACK_HASH_SALT in .env}
+
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8080}
+      DATABASE_URL: postgres://${POSTGRES_USER:-zerowaste}:${POSTGRES_PASSWORD:-zerowaste-local-only}@postgres:5432/${POSTGRES_DB:-zerowaste}
+
+      AI_SERVICE_URL: http://ai-service:8000
+
+      STORAGE_DRIVER: s3
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-zerowaste-invoices}
+      STORAGE_ENDPOINT: http://minio:9000
+      STORAGE_FORCE_PATH_STYLE: "true"
+      STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
+      STORAGE_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-zerowaste}
+      STORAGE_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-zerowaste-local-only}
+
+      ZEROWASTE_DATA_DIR: /var/lib/zerowaste
+    volumes:
+      # Bind-mounted rather than a named volume, and shared read-only with the
+      # ai-service above: the two must see one directory. See that comment.
+      - ./data:/var/lib/zerowaste
+    ports:
+      - "127.0.0.1:5000:5000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5000/health/live',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+      args:
+        # Empty: the bundle issues same-origin requests and nginx proxies them.
+        VITE_API_BASE: ""
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_HOST: backend
+      BACKEND_PORT: "5000"
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  postgres-data:
+  minio-data:

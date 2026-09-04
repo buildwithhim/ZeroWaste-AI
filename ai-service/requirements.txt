@@ -1,0 +1,10 @@
+# FastAPI wrapper dependencies.
+#
+# Kept separate from the repository-root requirements.txt, which pins the
+# model and extraction libraries that predict.py and parse_invoices.py import.
+# Those are shared with the training scripts and the test suite; these are only
+# needed by the HTTP service, and installing a web framework into a developer's
+# virtualenv to run the tests would be gratuitous.
+fastapi==0.121.2
+uvicorn==0.41.0
+pydantic==2.13.0

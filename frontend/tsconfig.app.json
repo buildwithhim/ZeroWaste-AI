@@ -1,9 +1,15 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2020",
+
+    // ES2022, not ES2020. Array.prototype.at() is ES2022 and is already used
+    // in the test suite; with lib set to ES2020 `tsc -b` failed on it, which
+    // nobody noticed because the only type-check in CI was a no-op. Every
+    // browser this app supports has shipped ES2022 for years.
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -15,7 +21,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src"],
+
+  // Tests are type-checked by tsconfig.test.json, not here. `npm run build`
+  // runs this config, and a production build should not be able to fail on
+  // test-only code -- nor should a release be blocked by files that are
+  // excluded from the Docker context and never reach the image.
+  "exclude": ["src/test", "src/**/*.test.ts", "src/**/*.test.tsx"]
 }

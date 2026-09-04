@@ -1,0 +1,64 @@
+# Build context exclusions.
+#
+# All three Dockerfiles use the repository root as their context, so without
+# this every build uploads node_modules, the Python virtualenv, test artefacts
+# and the local data directory to the daemon -- hundreds of megabytes, on every
+# build, to produce images that use none of it.
+#
+# It is also a security boundary. The context is what a Dockerfile *can* copy;
+# anything excluded here cannot end up in a layer by accident. A stray `.env`
+# or a copy of the invoice vault baked into a published image is not something
+# a later fix can remove, because the layer is still there in the registry.
+
+# --- Dependencies (reinstalled inside the image from lockfiles) -------------
+**/node_modules
+.venv
+**/__pycache__
+**/*.pyc
+
+# --- Secrets and local configuration ---------------------------------------
+.env
+.env.*
+!.env.example
+**/*.pem
+**/*.key
+**/.aws
+**/.npmrc
+
+# --- Runtime data ----------------------------------------------------------
+# The invoice vault holds original supplier PDFs and the JSON stores hold real
+# booking and feedback history. Neither belongs in an image.
+data/
+!data/.gitkeep
+
+# --- Build output (rebuilt in the image) -----------------------------------
+**/dist
+**/build
+frontend/dist
+
+# --- Tests and artefacts ---------------------------------------------------
+**/coverage
+e2e/
+playwright-report/
+test-results/
+frontend/src/test/
+backend/tests/
+**/*.test.js
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# --- VCS and tooling -------------------------------------------------------
+.git
+.github
+.gitignore
+.vscode
+.idea
+
+# --- Docs ------------------------------------------------------------------
+# Excluded from the context, not from the repository. Documentation changes on
+# a different cadence than code, and including it would invalidate the layer
+# cache for a typo fix in a README.
+*.md
+docs/
