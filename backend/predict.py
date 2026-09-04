@@ -16,7 +16,9 @@ import joblib
 import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "..", "data")
+# Mirrors backend/lib/dataDir.js so Node and Python always agree on where
+# runtime state lives -- the test harness points both at one temp directory.
+DATA_DIR = os.environ.get("ZEROWASTE_DATA_DIR") or os.path.join(BASE_DIR, "..", "data")
 SIGNALS_PATH = os.path.join(DATA_DIR, "feedback_signals.json")
 
 MIN_SIGNAL_SAMPLE = 4

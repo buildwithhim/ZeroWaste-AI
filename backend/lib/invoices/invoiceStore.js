@@ -22,21 +22,22 @@ const path = require("path");
 
 const { COMPARABLE_FIELDS } = require("./invoiceModel");
 
-const DATA_DIR = path.join(__dirname, "..", "..", "..", "data");
-const STORE_PATH = path.join(DATA_DIR, "invoices.json");
+const { dataDir, dataPath } = require("../dataDir");
+
+const storePath = () => dataPath("invoices.json");
 
 /**
  * Original PDFs live outside the web root and are never mounted as static
  * files; the only way out is the admin-guarded download route. Files are named
  * by content hash so a hostile upload name cannot influence the path.
  */
-const VAULT_DIR = path.join(DATA_DIR, "invoice_vault");
+const vaultDir = () => dataPath("invoice_vault");
 
 const emptyStore = () => ({ version: 1, records: [], conflicts: [] });
 
 function readStore() {
   try {
-    const parsed = JSON.parse(fs.readFileSync(STORE_PATH, "utf8"));
+    const parsed = JSON.parse(fs.readFileSync(storePath(), "utf8"));
     return {
       version: 1,
       records: Array.isArray(parsed.records) ? parsed.records : [],
@@ -48,16 +49,18 @@ function readStore() {
 }
 
 function writeStore(store) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const tempPath = `${STORE_PATH}.tmp`;
+  fs.mkdirSync(dataDir(), { recursive: true });
+  const target = storePath();
+  const tempPath = `${target}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify(store, null, 2));
-  fs.renameSync(tempPath, STORE_PATH);
+  fs.renameSync(tempPath, target);
 }
 
 /** Persists the original bytes. Returns the vault-relative name. */
 function storeRaw(buffer, contentHash) {
-  fs.mkdirSync(VAULT_DIR, { recursive: true });
-  const target = path.join(VAULT_DIR, `${contentHash}.pdf`);
+  const vault = vaultDir();
+  fs.mkdirSync(vault, { recursive: true });
+  const target = path.join(vault, `${contentHash}.pdf`);
   // Identical content is stored once; the hash guarantees the bytes match.
   if (!fs.existsSync(target)) {
     fs.writeFileSync(target, buffer, { mode: 0o600 });
@@ -68,7 +71,7 @@ function storeRaw(buffer, contentHash) {
 /** Reads an original back. The hash is validated to keep the path inside the vault. */
 function readRaw(contentHash) {
   if (!/^[a-f0-9]{64}$/.test(String(contentHash || ""))) return null;
-  const target = path.join(VAULT_DIR, `${contentHash}.pdf`);
+  const target = path.join(vaultDir(), `${contentHash}.pdf`);
   return fs.existsSync(target) ? fs.readFileSync(target) : null;
 }
 
@@ -287,6 +290,6 @@ module.exports = {
   readRaw,
   diffRecords,
   reset,
-  STORE_PATH,
-  VAULT_DIR,
+  storePath,
+  vaultDir,
 };

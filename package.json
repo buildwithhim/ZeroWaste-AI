@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test:backend && npm run test:frontend && npm run test:e2e",
+    "test:backend": "npm --prefix backend test",
+    "test:frontend": "npm --prefix frontend test",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config e2e/playwright.config.ts --ui",
+    "test:e2e:report": "playwright show-report e2e/.report",
     "seed:feedback": "node scripts/seed_feedback.js",
     "invoices:fixtures": "python scripts/make_test_invoice.py",
     "start:backend": "npm --prefix backend start"
@@ -24,5 +29,8 @@
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }

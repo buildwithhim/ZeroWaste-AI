@@ -1,0 +1,164 @@
+name: Tests
+
+# Runs the whole pyramid on every push and pull request.
+#
+# The three test jobs are separate so a failure names its own layer in the
+# checks list -- "E2E" failing is a very different investigation to "Unit"
+# failing. E2E depends on the other two because there is no point spending two
+# minutes booting browsers to rediscover a broken unit test.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  backend:
+    name: Backend (unit + API)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      # The prediction and invoice suites spawn a real interpreter. Without
+      # this they would skip, and a broken predictor would merge unnoticed.
+      - name: Install Python dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run backend tests with coverage
+        working-directory: backend
+        # Thresholds live in vitest.config.mjs and fail the job on their own.
+        run: npm run test:coverage
+        env:
+          # predictor.js defaults to a Windows venv path; Linux needs telling.
+          PYTHON_PATH: ${{ github.workspace }}/.venv/bin/python
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          retention-days: 7
+
+  frontend:
+    name: Frontend (component)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm test
+
+      - name: Type-check
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+  e2e:
+    name: E2E (critical journeys)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      # Journey 4 parses a real PDF with pdfplumber; journeys 2 and 3 read a
+      # forecast from the real model. Neither is stubbed.
+      - name: Install Python dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm --prefix backend ci
+          npm --prefix frontend ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run end-to-end journeys
+        run: npm run test:e2e
+        env:
+          CI: "true"
+          PYTHON_PATH: ${{ github.workspace }}/.venv/bin/python
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/.report/
+            e2e/.artifacts/
+          retention-days: 7
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    # Reports but never blocks. The two known moderate advisories (qs, via
+    # body-parser, via Express 5) have no upstream fix, so blocking here would
+    # stop every unrelated change. See SECURITY_AUDIT.md L6.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Audit backend
+        working-directory: backend
+        run: npm audit --omit=dev
+
+      - name: Audit frontend
+        working-directory: frontend
+        run: npm audit --omit=dev

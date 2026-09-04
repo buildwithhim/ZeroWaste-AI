@@ -12,20 +12,21 @@
  */
 
 const fs = require("fs");
-const path = require("path");
 
-const DATA_DIR = path.join(__dirname, "..", "..", "..", "data");
-const STORE_PATH = path.join(DATA_DIR, "prediction_log.json");
+const { dataDir, dataPath } = require("../dataDir");
+
+const storePath = () => dataPath("prediction_log.json");
 
 const emptyStore = () => ({ version: 1, entries: [] });
 
 function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  const directory = dataDir();
+  if (!fs.existsSync(directory)) fs.mkdirSync(directory, { recursive: true });
 }
 
 function readStore() {
   try {
-    const parsed = JSON.parse(fs.readFileSync(STORE_PATH, "utf8"));
+    const parsed = JSON.parse(fs.readFileSync(storePath(), "utf8"));
     return Array.isArray(parsed.entries) ? parsed : emptyStore();
   } catch {
     return emptyStore();
@@ -34,9 +35,10 @@ function readStore() {
 
 function writeStore(store) {
   ensureDataDir();
-  const tempPath = `${STORE_PATH}.tmp`;
+  const target = storePath();
+  const tempPath = `${target}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify(store, null, 2));
-  fs.renameSync(tempPath, STORE_PATH);
+  fs.renameSync(tempPath, target);
 }
 
 /**
@@ -91,4 +93,4 @@ function replaceAll(entries) {
   return entries.length;
 }
 
-module.exports = { recordPlan, listAll, listForDate, loggedDates, hasPlanFor, replaceAll, STORE_PATH };
+module.exports = { recordPlan, listAll, listForDate, loggedDates, hasPlanFor, replaceAll, storePath };

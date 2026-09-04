@@ -9,10 +9,10 @@
  */
 
 const fs = require("fs");
-const path = require("path");
 
-const DATA_DIR = path.join(__dirname, "..", "..", "..", "data");
-const ROSTER_PATH = path.join(DATA_DIR, "roster.json");
+const { dataDir, dataPath } = require("../dataDir");
+
+const rosterPath = () => dataPath("roster.json");
 
 const DEFAULT_HEADCOUNT = 400;
 
@@ -27,7 +27,7 @@ function readRoster() {
   }
 
   try {
-    const parsed = JSON.parse(fs.readFileSync(ROSTER_PATH, "utf8"));
+    const parsed = JSON.parse(fs.readFileSync(rosterPath(), "utf8"));
     const headcount = Number(parsed.totalEmployees);
     if (Number.isFinite(headcount) && headcount > 0) {
       return {
@@ -48,10 +48,11 @@ function saveRoster({ totalEmployees, site }) {
   const headcount = Number(totalEmployees);
   if (!Number.isFinite(headcount) || headcount <= 0) throw new Error("totalEmployees must be a positive number");
 
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  const directory = dataDir();
+  if (!fs.existsSync(directory)) fs.mkdirSync(directory, { recursive: true });
   const record = { totalEmployees: Math.round(headcount), site: site || "All sites", updatedAt: new Date().toISOString() };
-  fs.writeFileSync(ROSTER_PATH, JSON.stringify(record, null, 2));
+  fs.writeFileSync(rosterPath(), JSON.stringify(record, null, 2));
   return { ...record, source: "roster-file" };
 }
 
-module.exports = { readRoster, saveRoster, DEFAULT_HEADCOUNT, ROSTER_PATH };
+module.exports = { readRoster, saveRoster, DEFAULT_HEADCOUNT, rosterPath };

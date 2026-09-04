@@ -1,6 +1,15 @@
 import axios from "axios";
 
-export const API_BASE = "http://localhost:5000";
+/**
+ * Where the backend lives.
+ *
+ * Overridable through VITE_API_BASE so an end-to-end run can point the app at
+ * a backend started on a spare port against a disposable data directory,
+ * rather than at whatever happens to be on 5000 -- which during development is
+ * a server writing into the repository's real `data/` folder. The default is
+ * unchanged, so nothing about ordinary local development moves.
+ */
+export const API_BASE = import.meta.env?.VITE_API_BASE ?? "http://localhost:5000";
 
 /** The four post-meal responses an employee can give. */
 export const FEEDBACK_RESPONSES = ["Finished", "Left some", "Left most", "Wanted more"] as const;

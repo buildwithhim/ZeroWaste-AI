@@ -11,17 +11,17 @@
  */
 
 const fs = require("fs");
-const path = require("path");
 
-const DATA_DIR = path.join(__dirname, "..", "..", "..", "data");
-const HISTORY_PATH = path.join(DATA_DIR, "invoice_imports.json");
-const AUDIT_PATH = path.join(DATA_DIR, "invoice_audit.log");
+const { dataDir, dataPath } = require("../dataDir");
+
+const historyPath = () => dataPath("invoice_imports.json");
+const auditPath = () => dataPath("invoice_audit.log");
 
 const MAX_HISTORY_BATCHES = 200;
 
 function readHistory() {
   try {
-    const parsed = JSON.parse(fs.readFileSync(HISTORY_PATH, "utf8"));
+    const parsed = JSON.parse(fs.readFileSync(historyPath(), "utf8"));
     return Array.isArray(parsed.batches) ? parsed.batches : [];
   } catch {
     return [];
@@ -29,10 +29,11 @@ function readHistory() {
 }
 
 function writeHistory(batches) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const tempPath = `${HISTORY_PATH}.tmp`;
+  fs.mkdirSync(dataDir(), { recursive: true });
+  const target = historyPath();
+  const tempPath = `${target}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify({ version: 1, batches }, null, 2));
-  fs.renameSync(tempPath, HISTORY_PATH);
+  fs.renameSync(tempPath, target);
 }
 
 /**
@@ -42,9 +43,9 @@ function writeHistory(batches) {
  * cannot truncate earlier entries, and so the file is never open for rewriting.
  */
 function audit(event) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.mkdirSync(dataDir(), { recursive: true });
   const line = JSON.stringify({ at: new Date().toISOString(), ...event });
-  fs.appendFileSync(AUDIT_PATH, `${line}\n`, { mode: 0o600 });
+  fs.appendFileSync(auditPath(), `${line}\n`, { mode: 0o600 });
 }
 
 /** Records a completed batch and audits every file decision within it. */
@@ -95,7 +96,7 @@ const findBatch = (batchId) => readHistory().find((batch) => batch.id === batchI
 function readAudit(limit = 100) {
   try {
     return fs
-      .readFileSync(AUDIT_PATH, "utf8")
+      .readFileSync(auditPath(), "utf8")
       .split("\n")
       .filter(Boolean)
       .slice(-limit)
@@ -113,4 +114,4 @@ function readAudit(limit = 100) {
   }
 }
 
-module.exports = { recordBatch, recordResolution, listBatches, findBatch, readAudit, audit, HISTORY_PATH, AUDIT_PATH };
+module.exports = { recordBatch, recordResolution, listBatches, findBatch, readAudit, audit, historyPath, auditPath };

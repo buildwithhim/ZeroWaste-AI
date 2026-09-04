@@ -19,9 +19,13 @@ currently broken:
 | access admin APIs | ❌ **Broken** | Admin token is hardcoded in the frontend bundle (C2) |
 | upload invoices | ❌ **Broken** | `POST /admin/invoices/import` accepts the same leaked token (C2) |
 | view company-wide analytics | ❌ **Broken** | `/admin/analytics/*`, `/admin/operations/*` reachable with the leaked token (C2) |
-| manipulate prediction results | ❌ **Broken** | Unauthenticated booking/feedback writes poison the model; `POST /admin/operations/service` rewrites actuals (C3) |
+| manipulate prediction results | ❌ **Broken** | Unauthenticated booking/feedback writes poison the model (C3); a *single* response moves the cook quantity because the predictor skips its own sample threshold (C5); `POST /admin/operations/service` rewrites actuals (C3) |
 
-Counts: **4 Critical**, **4 High**, **7 Medium**, **6 Low**.
+Counts: **5 Critical**, **4 High**, **7 Medium**, **6 Low**.
+
+> **C5 was found by the test suite**, not by reading the code — see
+> `backend/tests/api/prediction.test.js`. It is reproduced against the shipped model and is
+> pinned by a characterisation test so the behaviour cannot change unnoticed.
 
 ---
 
@@ -123,6 +127,49 @@ on shared/kiosk machines, and is fully attacker-chosen on write. Ownership is ne
 
 **Impact:** direct violation of "an employee must never access another employee's bookings",
 plus their feedback history and personal impact profile.
+
+---
+
+### C5 — A single unauthenticated feedback response moves the kitchen's cook quantity
+**Files:** `backend/predict.py:66-72`, `backend/server.js:101-125`
+
+`resolve_multiplier` enforces `MIN_SIGNAL_SAMPLE` (4) on the menu-family and weekday buckets,
+then **falls through to the cafeteria-wide bucket with no threshold at all**:
+
+```python
+day = (signals.get("byWeekday") or {}).get(weekday)
+if day and day.get("responses", 0) >= MIN_SIGNAL_SAMPLE:   # gated
+    ...
+global_signal = signals.get("global") or {}                # NOT gated
+total = int(signals.get("totalResponses", 0))
+return (float(global_signal.get("portionMultiplier", 1.0)), total, ...)
+```
+
+`POST /feedback` is unauthenticated and accepts an arbitrary `employeeId` (C3), and it calls
+`refreshSignals` synchronously on every write. So one anonymous request is enough to change the
+number the kitchen cooks to.
+
+Reproduced against the shipped model (`backend/tests/api/prediction.test.js`):
+
+| State | `basePrediction` | `portionMultiplier` | `recommendedServings` |
+| --- | --- | --- | --- |
+| No feedback | 331 | 1.0 | 331 |
+| One `"Wanted more"` response | 331 | 1.021 | **338** |
+
+Note the contrast with the rest of the system, which gets this right: `toPublicSignals`
+(`lib/signals.js:140-143`) and `buildPortionAdvice` (`lib/operations/portionAdvice.js:69-74`)
+both apply the threshold to the global bucket. Only the predictor omits it.
+
+Blast radius is bounded by `MULTIPLIER_BOUNDS` (0.6–1.25), so this is production distortion of
+up to ±25%, not unbounded. That bound is the only thing keeping this out of the "shut the
+kitchen down" category.
+
+**Fix:** apply `MIN_SIGNAL_SAMPLE` to the global fallback in `resolve_multiplier`, returning
+`(1.0, total, "not enough feedback yet")` below the threshold — matching what `signals.js` and
+`portionAdvice.js` already do. Authenticating `POST /feedback` (C3) is the other half.
+
+**Impact:** direct violation of "an employee must never manipulate prediction results", by an
+attacker who does not even need to be an employee.
 
 ---
 
@@ -260,7 +307,9 @@ turning the only identity token the system has into a widely-logged value (feeds
    identity, not a shared secret.
 3. **C4 / M7** — derive `employeeId` from the authenticated session; never accept it from the
    client.
-4. **C3 / H2** — authenticate the write paths and add rate limiting.
+4. **C3 / C5 / H2** — authenticate the write paths, add rate limiting, and apply
+   `MIN_SIGNAL_SAMPLE` to the global fallback in `predict.py`. C5 alone is a one-line change and
+   is worth doing immediately, independently of everything above it.
 5. **H1** — origin allow-list for CORS.
 6. **H3 / M1** — fail fast on missing secrets; purge committed runtime data and rotate the salt.
 7. **M2 / M3 / M4 / M5 / M6** — dependency upgrades, error sanitisation, `helmet` + HTTPS,
